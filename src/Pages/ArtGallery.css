@@ -318,3 +318,469 @@
 {
   margin-top: 200px;;
 }
+
+/* ===================================================== */
+/* 3D PAINTING DETAILS - ULTRA LUXURY ART GALLERY STYLES */
+/* ===================================================== */
+
+:root {
+  --gallery-bg: #07080b;
+  --gallery-surface: #0f1118;
+  --gallery-gold: #d4af37;
+  --gallery-gold-glow: rgba(212, 175, 55, 0.4);
+  --gallery-gold-border: rgba(212, 175, 55, 0.28);
+  --text-pure: #ffffff;
+  --text-dim: #9aa0b2;
+}
+
+.painting-details-3d-root {
+  min-height: 100vh;
+  background: radial-gradient(ellipse at 50% 15%, #151824 0%, #07080b 75%);
+  color: var(--text-pure);
+  position: relative;
+  overflow-x: hidden;
+  padding: 80px 24px 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Volumetric Museum Spotlight Beam */
+.details-spotlight-beam {
+  position: absolute;
+  top: 0;
+  left: 35%;
+  transform: translateX(-50%);
+  width: 900px;
+  height: 700px;
+  background: radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.12) 0%, transparent 65%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.details-content-wrapper {
+  max-width: 1360px;
+  width: 100%;
+  margin: 0 auto;
+  position: relative;
+  z-index: 3;
+}
+
+.details-grid-layout {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+
+/* 3D Artwork Stage & Canvas */
+.stage-3d-column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+.artwork-3d-viewport {
+  position: relative;
+  width: 100%;
+  max-width: 580px;
+  height: 680px;
+  cursor: grab;
+}
+
+.artwork-3d-viewport:active {
+  cursor: grabbing;
+}
+
+.artwork-3d-rig {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.frame-3d-exterior {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
+  background: #12141d;
+  padding: 14px;
+  box-sizing: border-box;
+  border: 1.5px solid var(--gallery-gold-border);
+  box-shadow: 0 35px 75px rgba(0, 0, 0, 0.92), 0 0 40px rgba(212, 175, 55, 0.12);
+  transform-style: preserve-3d;
+}
+
+.frame-gold-fillet {
+  position: absolute;
+  inset: 8px;
+  border: 1.5px solid rgba(212, 175, 55, 0.7);
+  border-radius: 14px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.canvas-3d-surface {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  overflow: hidden;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.6);
+}
+
+.canvas-varnish-glare {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  transition: opacity 0.25s ease;
+}
+
+.floating-3d-badge {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  background: rgba(10, 12, 18, 0.85);
+  border: 1px solid var(--gallery-gold-border);
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--gallery-gold);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 5;
+}
+
+.badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gallery-gold);
+  box-shadow: 0 0 8px var(--gallery-gold);
+}
+
+.frame-floor-shadow {
+  position: absolute;
+  bottom: -40px;
+  left: 10%;
+  width: 80%;
+  height: 30px;
+  background: radial-gradient(ellipse, rgba(0, 0, 0, 0.9) 0%, transparent 70%);
+  filter: blur(8px);
+  pointer-events: none;
+}
+
+/* 3D Tool Controls */
+.stage-controls-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 35px;
+  background: rgba(18, 20, 28, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 6px 14px;
+  border-radius: 999px;
+  backdrop-filter: blur(14px);
+}
+
+.tool-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.tool-btn:hover {
+  color: var(--text-pure);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.tool-btn.active {
+  background: rgba(212, 175, 55, 0.22);
+  border-color: var(--gallery-gold);
+  color: var(--gallery-gold);
+}
+
+.stage-hint {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.45);
+  margin-top: 14px;
+  letter-spacing: 0.3px;
+}
+
+/* 3D Details & Provenance Glass Card */
+.details-info-column {
+  width: 100%;
+}
+
+.info-3d-glass-card {
+  background: rgba(15, 18, 26, 0.78);
+  border: 1px solid var(--gallery-gold-border);
+  border-radius: 24px;
+  padding: 50px 45px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.info-3d-glass-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 20%;
+  right: 20%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gallery-gold), transparent);
+}
+
+.info-top-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.provenance-tag {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--gallery-gold);
+}
+
+.provenance-year {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+}
+
+.title-art-3d {
+  font-size: clamp(2.4rem, 4.5vw, 3.8rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, #ffffff 40%, #e8d5a8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0 0 20px;
+  line-height: 1.15;
+}
+
+.description-art-3d {
+  font-size: 1.12rem;
+  line-height: 1.85;
+  color: var(--text-dim);
+  margin: 0 0 34px;
+}
+
+/* Metadata Grid */
+.artwork-meta-box {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 22px 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 40px;
+}
+
+.meta-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.98rem;
+}
+
+.meta-label { color: var(--text-dim); }
+.meta-value { color: #fff; font-weight: 600; }
+.meta-value.status-available { color: #2ecc71; }
+
+/* Action Buttons */
+.action-buttons-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px;
+}
+
+.btn-back-3d {
+  padding: 15px 32px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.btn-back-3d:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: #fff;
+}
+
+.btn-inquire-3d {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 15px 34px;
+  background: linear-gradient(135deg, #d4af37 0%, #b89327 100%);
+  color: #07080b;
+  font-size: 1rem;
+  font-weight: 800;
+  border-radius: 10px;
+  text-decoration: none;
+  box-shadow: 0 10px 25px rgba(212, 175, 55, 0.35);
+  transition: all 0.25s ease;
+}
+
+.btn-inquire-3d:hover {
+  box-shadow: 0 15px 35px rgba(212, 175, 55, 0.55);
+  transform: translateY(-2px);
+  color: #07080b;
+}
+
+/* Fullscreen Zoom Modal */
+.zoom-inspect-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 5, 8, 0.95);
+  backdrop-filter: blur(20px);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+}
+
+.zoom-modal-content {
+  position: relative;
+  max-width: 900px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.zoom-close-btn {
+  position: absolute;
+  top: -50px;
+  right: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-size: 1.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.zoom-close-btn:hover {
+  background: #e74c3c;
+  border-color: #e74c3c;
+}
+
+.zoom-modal-img {
+  max-width: 100%;
+  max-height: 80vh;
+  object-fit: contain;
+  border-radius: 12px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.95), 0 0 35px rgba(212, 175, 55, 0.2);
+}
+
+.zoom-modal-caption {
+  margin-top: 18px;
+  text-align: center;
+}
+
+.zoom-modal-caption h3 {
+  font-size: 1.6rem;
+  color: #fff;
+  margin: 0 0 4px;
+}
+
+.zoom-modal-caption p {
+  font-size: 0.9rem;
+  color: var(--gallery-gold);
+  margin: 0;
+}
+
+/* Not Found View */
+.painting-not-found-3d {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  color: #fff;
+  background: #07080b;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+  .details-grid-layout {
+    grid-template-columns: 1fr;
+    gap: 50px;
+  }
+
+  .artwork-3d-viewport {
+    height: 520px;
+  }
+
+  .info-3d-glass-card {
+    padding: 35px 28px;
+  }
+}
+
+@media (max-width: 768px) {
+  .painting-details-3d-root {
+    padding: 60px 16px 80px;
+  }
+
+  .artwork-3d-viewport {
+    height: 440px;
+  }
+
+  .title-art-3d {
+    font-size: 2.1rem;
+  }
+
+  .description-art-3d {
+    font-size: 1rem;
+  }
+
+  .action-buttons-group {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .btn-back-3d,
+  .btn-inquire-3d {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+  }
+}

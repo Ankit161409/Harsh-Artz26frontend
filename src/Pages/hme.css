@@ -1,0 +1,315 @@
+ 
+
+ 
+.art-row{
+    display: flex;
+   margin: 0 auto;
+      width: 1520px;
+    height: 800px;
+    margin-left: -80px;
+}
+ 
+/* ================================= */
+/* ARTWORK IMAGE */
+/* ================================= */
+
+.flip-front,
+.art-new {
+  position: relative;
+  overflow: hidden;
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+
+/* ================================= */
+/* HOVER OVERLAY */
+/* ================================= */
+
+.art-hover-overlay {
+  position: absolute;
+
+  inset: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(0, 0, 0, 0);
+
+  opacity: 0;
+
+  transition:
+    background 0.35s ease,
+    opacity 0.35s ease;
+
+  pointer-events: none;
+}
+
+
+/* ================================= */
+/* HOVER STATE */
+/* ================================= */
+
+.flip-front:hover .art-hover-overlay,
+.art-new:hover .art-hover-overlay {
+  background: rgba(0, 0, 0, 0.35);
+
+  opacity: 1;
+}
+
+
+/* ================================= */
+/* ARTWORK NAME */
+/* ================================= */
+
+.artwork-name {
+  color: white;
+
+  font-size: 28px;
+  font-weight: 600;
+
+  letter-spacing: 2px;
+
+  text-align: center;
+
+  text-transform: uppercase;
+
+  padding: 12px 25px;
+
+  transform: translateY(15px);
+
+  opacity: 0;
+
+  transition:
+    transform 0.35s ease,
+    opacity 0.35s ease;
+}
+
+
+/* ================================= */
+/* NAME ANIMATION */
+/* ================================= */
+
+.flip-front:hover .artwork-name,
+.art-new:hover .artwork-name {
+  transform: translateY(0);
+
+  opacity: 1;
+}
+
+/* ========================================= */
+/* ARTWORK SLIDESHOW */
+/* ========================================= */
+
+.slideshow-row {
+  display: block !important;
+  position: relative;
+  overflow: hidden;
+  }
+
+
+/* ========================================= */
+/* SLIDESHOW CONTAINER */
+/* ========================================= */
+
+.art-slideshow {
+  position: relative;
+
+  width: 100%;
+  height: 100%;
+
+  overflow: hidden;
+}
+
+
+/* ========================================= */
+/* SLIDE */
+/* ========================================= */
+
+.art-slide {
+  position: absolute;
+
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+
+/* ========================================= */
+/* HOVER OVERLAY */
+/* ========================================= */
+
+.art-slide-overlay {
+  position: absolute;
+
+  inset: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(0, 0, 0, 0);
+
+  opacity: 0;
+
+  transition:
+    background 0.35s ease,
+    opacity 0.35s ease;
+
+  pointer-events: none;
+}
+
+
+.art-slide:hover .art-slide-overlay {
+  background: rgba(0, 0, 0, 0.35);
+
+  opacity: 1;
+}
+
+
+/* ========================================= */
+/* ARTWORK NAME */
+/* ========================================= */
+
+.art-slide-name {
+  color: white;
+
+  font-size: 28px;
+  font-weight: 600;
+
+  letter-spacing: 2px;
+
+  text-transform: uppercase;
+
+  transform: translateY(15px);
+
+  opacity: 0;
+
+  transition:
+    transform 0.35s ease,
+    opacity 0.35s ease;
+}
+
+
+.art-slide:hover .art-slide-name {
+  transform: translateY(0);
+
+  opacity: 1;
+}
+
+
+/* ========================================= */
+/* PREVIOUS / NEXT BUTTONS */
+/* ========================================= */
+
+.slide-btn {
+  position: absolute;
+
+  top: 50%;
+  transform: translateY(-50%);
+
+  z-index: 10;
+
+  width: 50px;
+  height: 50px;
+
+  border: none;
+  border-radius: 50%;
+
+  background: rgba(0, 0, 0, 0.45);
+
+  color: white;
+
+  font-size: 24px;
+
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition:
+    background 0.3s ease,
+    transform 0.3s ease;
+}
+
+
+.slide-btn:hover {
+  background: rgba(0, 0, 0, 0.75);
+
+  transform: translateY(-50%) scale(1.08);
+}
+
+
+.slide-prev {
+  left: 25px;
+}
+
+
+.slide-next {
+  right: 25px;
+}
+
+
+/* ========================================= */
+/* SLIDE DOTS */
+/* ========================================= */
+
+.slide-dots {
+  position: absolute;
+
+  left: 50%;
+  bottom: 25px;
+
+  transform: translateX(-50%);
+
+  z-index: 10;
+
+  display: flex;
+
+  gap: 8px;
+}
+
+
+.slide-dot {
+  width: 9px;
+  height: 9px;
+
+  padding: 0;
+
+  border: none;
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.5);
+
+  cursor: pointer;
+
+  transition:
+    width 0.3s ease,
+    background 0.3s ease;
+}
+
+
+.slide-dot.active {
+  width: 28px;
+
+  border-radius: 10px;
+
+  background: white;
+}
+
+
+.slide-dot:hover {
+  background: white;
+}
+
+
+
