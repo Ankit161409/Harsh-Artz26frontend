@@ -196,23 +196,23 @@ const ColouredPencilCard3D = ({
                 "transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)",
             }}
           >
-              <motion.h1
-             className="card-description"
-             style={{
-               fontFamily: '"Cormorant Garamond", Georgia, serif',
-               fontSize: "2.0rem",
-               fontWeight: 500,
-               fontStyle: "italic",
-               letterSpacing: "0.4px",
-               lineHeight: 1.6,
-               color: "#e8dcc8",
-             }}
-           >
-             {trimWords(
-               painting.title || "Original pen artwork",
-               50
-             )}
+            <motion.h1
+              className="card-title"
+              whileHover={{
+                color: "#d4af37",
+              }}
+            >
+              {painting.title ||
+                "Untitled Coloured Pencil Artwork"}
             </motion.h1>
+
+            <p className="card-description">
+              {trimWords(
+                painting.description ||
+                  "Original coloured pencil artwork",
+                50
+              )}
+            </p>
 
             <div className="card-footer">
               <span className="artist-name" />
@@ -323,7 +323,7 @@ const ColouredPencil = () => {
       .catch((err) => {
         console.error("Fetch error:", err);
         setError(
-          "Unable to load coloured pencil artworks."
+          "Unable to load coloured pencil artworks from server , server not running."
         );
       })
       .finally(() => {

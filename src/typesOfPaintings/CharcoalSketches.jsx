@@ -324,7 +324,7 @@ const CharcoalSketches = () => {
         setError("");
       } catch (err) {
         console.error("Fetch error:", err);
-        setError("Unable to load charcoal artworks.");
+        setError("Unable to load charcoal artworks from server , server not running..");
       } finally {
         setLoading(false);
       }

@@ -314,7 +314,7 @@ const MixedMedia = () => {
         setArts(data);
       } catch (err) {
         console.error("Error fetching mixed media artworks:", err);
-        setError("Unable to load mixed media artworks.");
+        setError("Unable to load mixed media artworks from server , server not running..");
       } finally {
         setLoading(false);
       }

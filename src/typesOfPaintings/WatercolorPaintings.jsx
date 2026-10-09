@@ -357,7 +357,7 @@ const WatercolorPaintings = () => {
             err
           );
 
-          setError("Unable to load watercolor paintings.");
+          setError("Unable to load watercolor paintings from server , server not running..");
         }
       })
       .finally(() => {

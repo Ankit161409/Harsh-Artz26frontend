@@ -309,7 +309,7 @@ const DigitalArt = () => {
       })
       .catch((err) => {
         console.error("Error fetching digital artworks:", err);
-        setError("Unable to load digital artworks.");
+        setError("Unable to load digital artworks from server , server not running.");
       })
       .finally(() => {
         setLoading(false);

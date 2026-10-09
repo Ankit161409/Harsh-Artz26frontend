@@ -315,7 +315,7 @@ const PenSketches = () => {
       })
       .catch((err) => {
         console.error("Error fetching pen artworks:", err);
-        setError("Unable to load pen artworks.");
+        setError("Unable to load pen artworks from server , server not running..");
       })
       .finally(() => {
         setLoading(false);
