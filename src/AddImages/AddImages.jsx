@@ -76,7 +76,7 @@ export default function AddImage() {
       formData.append("title", title);
       formData.append("image", image);
 
-      const response = await fetch(`http://localhost:8081/api/${painting}`, {
+      const response = await fetch(`https://harsh-arts-backend-2.onrender.com/api/${painting}`, {
         method: "POST",
         body: formData,
       });

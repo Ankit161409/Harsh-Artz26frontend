@@ -330,7 +330,7 @@ const WatercolorPaintings = () => {
   useEffect(() => {
     const controller = new AbortController();
 
-    fetch("http://localhost:8081/api/getWatercolors", {
+    fetch("https://harsh-arts-backend-2.onrender.com/api/getWatercolors", {
       signal: controller.signal,
     })
       .then((response) => {
@@ -392,7 +392,7 @@ const WatercolorPaintings = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:8081/api/deleteWatercolor/${painting.id}`,
+        `https://harsh-arts-backend-2.onrender.com/api/deleteWatercolor/${painting.id}`,
         {
           method: "DELETE",
         }

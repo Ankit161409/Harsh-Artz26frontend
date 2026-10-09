@@ -301,7 +301,7 @@ const ColouredPencil = () => {
   // FETCH COLOURED PENCIL ARTWORKS
   const fetchArts = () => {
     return fetch(
-      "http://localhost:8081/api/getColouredPencil"
+      "https://harsh-arts-backend-2.onrender.com/api/getColouredPencil"
     )
       .then((response) => {
         if (!response.ok) {
@@ -356,7 +356,7 @@ const ColouredPencil = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:8081/api/deleteColouredPencil/${encodeURIComponent(id)}`,
+        `https://harsh-arts-backend-2.onrender.com/api/deleteColouredPencil/${encodeURIComponent(id)}`,
         {
           method: "DELETE",
         }

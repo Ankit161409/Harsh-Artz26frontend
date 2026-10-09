@@ -303,7 +303,7 @@ const MixedMedia = () => {
     const fetchArts = async () => {
       try {
         const response = await fetch(
-          "http://localhost:8081/api/getMixedMedia"
+          "https://harsh-arts-backend-2.onrender.com/api/getMixedMedia"
         );
 
         if (!response.ok) {
@@ -337,7 +337,7 @@ const MixedMedia = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:8081/api/deleteMixedMedia/${id}`,
+        `https://harsh-arts-backend-2.onrender.com/api/deleteMixedMedia/${id}`,
         {
           method: "DELETE",
         }

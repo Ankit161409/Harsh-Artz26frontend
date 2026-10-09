@@ -302,7 +302,7 @@ const PenSketches = () => {
     setLoading(true);
     setError("");
 
-    fetch("http://localhost:8081/api/getPenSketches")
+    fetch("https://harsh-arts-backend-2.onrender.com/api/getPenSketches")
       .then((response) => {
         if (!response.ok) {
           throw new Error("Failed to fetch pen artworks");
@@ -347,7 +347,7 @@ const PenSketches = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:8081/api/deletePenSketches/${encodeURIComponent(
+        `https://harsh-arts-backend-2.onrender.com/api/deletePenSketches/${encodeURIComponent(
           painting.id
         )}`,
         {

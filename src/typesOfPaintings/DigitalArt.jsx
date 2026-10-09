@@ -296,7 +296,7 @@ const DigitalArt = () => {
 
   // FETCH DIGITAL ARTWORKS
   useEffect(() => {
-    fetch("http://localhost:8081/api/getDigitalArt")
+    fetch("https://harsh-arts-backend-2.onrender.com/api/getDigitalArt")
       .then((response) => {
         if (!response.ok) {
           throw new Error("Failed to fetch digital artworks");
@@ -341,7 +341,7 @@ const DigitalArt = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:8081/api/deleteDigitalArt/${encodeURIComponent(id)}`,
+        `https://harsh-arts-backend-2.onrender.com/api/deleteDigitalArt/${encodeURIComponent(id)}`,
         {
           method: "DELETE",
         }
