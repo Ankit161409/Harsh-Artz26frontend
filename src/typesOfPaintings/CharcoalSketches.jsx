@@ -311,7 +311,7 @@ const CharcoalSketches = () => {
     const fetchArts = async () => {
       try {
         const response = await fetch(
-          "http://localhost:8081/api/getCharcoals"
+          "https://harsh-arts-backend-2.onrender.com/api/getCharcoals"
         );
 
         if (!response.ok) {
