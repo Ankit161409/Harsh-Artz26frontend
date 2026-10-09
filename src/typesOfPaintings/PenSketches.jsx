@@ -1,165 +1,49 @@
-
-// import React from "react";
-// import { motion } from "framer-motion";
-// import { useNavigate } from "react-router-dom";
-// import { Pen } from "../ImportImages/PenSketchesImport.js";
- 
-
-// // import '../ArtGallery.css';
-
-//   const PenSketches = () => {
-//   const navigate = useNavigate();
-
-//   const trimWords = (text = "", wordLimit = 15) => {
-//     const words = text.split(" ");
-//     return words.length > wordLimit
-//       ? words.slice(0, wordLimit).join(" ") + "..."
-//       : text;
-//   };
- 
- 
-//   return (
-//     <div className="background">
-//      <motion.div
-            
-//                   className="hero-content"
-//                   initial="hidden"
-//                   animate="visible"
-//                   variants={{
-//                     hidden: {},
-//                     visible: {
-//                       transition: {
-//                         staggerChildren: 0.25,
-//                       },
-//                     },
-//                   }}
-//                 >
-//                    <motion.h1
-//                    className="side"
-//                    style={{ color: "black" }}
-//                             variants={{
-//                               hidden: { y: 40, opacity: 0 },
-//                               visible: { y: 0, opacity: 1 },
-//                             }}
-//                             transition={{ duration: 1, ease: "easeOut" }}
-//                           >
-                      
-                           
-//                           </motion.h1>
-//                         </motion.div>
-//       {/* Navbar */}
- 
-//       {/* Gallery */}
-//       <motion.div
-//         className="gallery-container top"
-//         initial="hidden"
-//         animate="visible"
-//         variants={{
-//           hidden: {},
-//           visible: {
-//             transition: { staggerChildren: 0.1 },
-//           },
-//         }}
-//       >
-//           <h1 className="font">Pen sketches</h1>
-//         {Pen.map((painting, index) => (
-//           <motion.div    style={{ color: "black", textAlign:"left"}}
-//             key={painting.id || index}
-//             className="art-card"
-//             variants={{
-//               hidden: { y: 60, opacity: 0 },
-//               visible: { y: 0, opacity: 1 },
-//             }}
-//             whileHover={{
-//               y: -15,
-//               scale: 1.02,
-//               boxShadow: "0 35px 60px -20px rgba(0,0,0,0.4)",
-//             }}
-//             transition={{ duration: 0.5, ease: "easeOut" }}
-//             // onClick={() => navigate(`/painting/${index}`)}
-//                         onClick={() => navigate(`/painting/Pen/${index}`)}
- 
-//           >
-//             <div className="card-image-container">
-//               <img
-//                 src={painting.img}
-//                 alt={painting.title}
-//                 className="card-image"
-//               />
-
-//               <div className="image-overlay">
-//                 <motion.div
-//                   className="view-details-btn"
-//                   whileHover={{ scale: 1.1 }}
-//                   whileTap={{ scale: 0.95 }}
-//                 >
-//                   View Details
-//                 </motion.div>
-//               </div>
-//             </div>
-
-//             <div className="card-content">
-//               <motion.h1
-//                 className="card-title"
-//                 whileHover={{ color: "#a855f7" }}
-//               >
-//                 {painting.title}
-//               </motion.h1>
-
-//               <p className="card-description" style={{ color: "black", textAlign:"left", marginTop:"20px"}}>
-//                 {trimWords(painting.description, 50)}
-//               </p>
-
-//               <div className="card-footer">
-//                 <span className="artist-name">
-//                   {/* by {painting.artist || "Unknown"} */}
-//                 </span>
-//               </div>
-//             </div>
-//           </motion.div>
-//         ))}
-//       </motion.div>
-//     </div>
-//   );
-// };
-
-
-//  export default PenSketches;
- 
-import React, { useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Pen } from "../ImportImages/PenSketchesImport.js";
 import "./PenSketches.css";
 
 /* ===================================================== */
-/* 3D TILT ARTWORK CARD COMPONENT                        */
+/* 3D PEN ARTWORK CARD */
 /* ===================================================== */
-const PenCard3D = ({ painting, index, navigate, trimWords }) => {
+
+const PenCard3D = ({
+  painting,
+  index,
+  navigate,
+  trimWords,
+  isAuthorized,
+  deletingId,
+  handleDeleteClick,
+}) => {
   const cardRef = useRef(null);
+
   const [rotateX, setRotateX] = useState(0);
   const [rotateY, setRotateY] = useState(0);
-  const [glarePos, setGlarePos] = useState({ x: 50, y: 50, opacity: 0 });
+
+  const [glarePos, setGlarePos] = useState({
+    x: 50,
+    y: 50,
+    opacity: 0,
+  });
+
   const [isHovered, setIsHovered] = useState(false);
 
-  // Safely extract image source (handles ES modules and paths with parentheses)
-  const imageSource =
-    typeof painting.img === "object" && painting.img !== null
-      ? painting.img.default || painting.img.src || painting.img
-      : painting.img;
+  const imageSource = painting.image
+    ? `data:image/jpeg;base64,${painting.image}`
+    : "/placeholder.jpg";
 
   const handleMouseMove = (e) => {
     if (!cardRef.current) return;
+
     const rect = cardRef.current.getBoundingClientRect();
+
     const xPercent = (e.clientX - rect.left) / rect.width;
     const yPercent = (e.clientY - rect.top) / rect.height;
 
-    // Real-time 3D tilt calculation
-    const tiltX = (0.5 - yPercent) * 20;
-    const tiltY = (xPercent - 0.5) * 20;
+    setRotateX((0.5 - yPercent) * 20);
+    setRotateY((xPercent - 0.5) * 20);
 
-    setRotateX(tiltX);
-    setRotateY(tiltY);
     setGlarePos({
       x: xPercent * 100,
       y: yPercent * 100,
@@ -167,14 +51,18 @@ const PenCard3D = ({ painting, index, navigate, trimWords }) => {
     });
   };
 
-  const handleMouseEnter = () => setIsHovered(true);
-
   const handleMouseLeave = () => {
     setIsHovered(false);
     setRotateX(0);
     setRotateY(0);
-    setGlarePos((prev) => ({ ...prev, opacity: 0 }));
+
+    setGlarePos((prev) => ({
+      ...prev,
+      opacity: 0,
+    }));
   };
+
+  const isDeleting = deletingId === painting.id;
 
   return (
     <motion.div
@@ -184,12 +72,19 @@ const PenCard3D = ({ painting, index, navigate, trimWords }) => {
         hidden: { y: 50, opacity: 0 },
         visible: { y: 0, opacity: 1 },
       }}
-      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+      transition={{
+        duration: 0.6,
+        ease: [0.22, 1, 0.36, 1],
+      }}
       onMouseMove={handleMouseMove}
-      onMouseEnter={handleMouseEnter}
+      onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={handleMouseLeave}
-      onClick={() => navigate(`/painting/Pen/${index}`)}
-      style={{ perspective: "1000px" }}
+      onClick={() =>
+        navigate(`/painting/Pen/${painting.id}`)
+      }
+      style={{
+        perspective: "1000px",
+      }}
     >
       <motion.div
         className="pen-card-3d-inner"
@@ -209,40 +104,47 @@ const PenCard3D = ({ painting, index, navigate, trimWords }) => {
           height: "100%",
         }}
       >
-        {/* Physical Museum Frame */}
         <div className="pen-card-frame">
           <div className="pen-frame-bevel" />
 
-          {/* Artwork Canvas (Pops out in 3D space) */}
+          {/* IMAGE */}
           <div
             className="pen-canvas-container"
             style={{
-              transform: isHovered ? "translateZ(32px)" : "translateZ(0px)",
-              transition: "transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)",
+              transform: isHovered
+                ? "translateZ(32px)"
+                : "translateZ(0px)",
+              transition:
+                "transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)",
             }}
           >
-            {/* Native <img> tag ensures 'pen (1).jpeg' files load without CSS parenthesis errors */}
             <img
               src={imageSource}
-              alt={painting.title}
+              alt={painting.title || "Pen artwork"}
               className="pen-canvas-image"
             />
 
-            {/* Specular Glare Reflection Layer */}
+            {/* GLARE */}
             <div
               className="pen-canvas-glare"
               style={{
-                background: `radial-gradient(circle at ${glarePos.x}% ${glarePos.y}%, rgba(255, 235, 190, 0.45) 0%, transparent 65%)`,
+                background: `radial-gradient(
+                  circle at ${glarePos.x}% ${glarePos.y}%,
+                  rgba(255, 235, 190, 0.45) 0%,
+                  transparent 65%
+                )`,
                 opacity: glarePos.opacity,
                 transform: "translateZ(38px)",
               }}
             />
 
-            {/* 3D Floating Medium Badge */}
+            {/* BADGE */}
             <div
               className="pen-card-floating-badge"
               style={{
-                transform: isHovered ? "translateZ(48px)" : "translateZ(15px)",
+                transform: isHovered
+                  ? "translateZ(48px)"
+                  : "translateZ(15px)",
                 transition: "transform 0.4s ease",
               }}
             >
@@ -250,7 +152,7 @@ const PenCard3D = ({ painting, index, navigate, trimWords }) => {
               <span>Ball Pen Sketch</span>
             </div>
 
-            {/* Hover Overlay with 3D Floating "View Details" Button */}
+            {/* VIEW DETAILS */}
             <div
               className="pen-image-overlay"
               style={{
@@ -263,8 +165,11 @@ const PenCard3D = ({ painting, index, navigate, trimWords }) => {
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
                 style={{
-                  transform: isHovered ? "translateZ(60px)" : "translateZ(20px)",
-                  transition: "transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)",
+                  transform: isHovered
+                    ? "translateZ(60px)"
+                    : "translateZ(20px)",
+                  transition:
+                    "transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)",
                 }}
               >
                 View Details
@@ -272,41 +177,100 @@ const PenCard3D = ({ painting, index, navigate, trimWords }) => {
             </div>
           </div>
 
-          {/* Card Content (Title, Description, Footer) */}
+          {/* CONTENT */}
           <div
             className="pen-card-content"
             style={{
-              transform: isHovered ? "translateZ(24px)" : "translateZ(0px)",
-              transition: "transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)",
+              transform: isHovered
+                ? "translateZ(24px)"
+                : "translateZ(0px)",
+              transition:
+                "transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)",
             }}
           >
+            
+
             <motion.h1
-              className="card-title"
-              whileHover={{ color: "#d4af37" }}
-            >
-              {painting.title}
-            </motion.h1>
-
-            <p className="card-description">
-              {trimWords(painting.description, 50)}
-            </p>
-
+  className="card-description"
+  style={{
+    fontFamily: '"Cormorant Garamond", Georgia, serif',
+    fontSize: "2.0rem",
+    fontWeight: 500,
+    fontStyle: "italic",
+    letterSpacing: "0.4px",
+    lineHeight: 1.6,
+    color: "#e8dcc8",
+  }}
+>
+  {trimWords(
+    painting.title || "Original pen artwork",
+    50
+  )}
+ </motion.h1>
             <div className="card-footer">
-              <span className="artist-name">
-                {/* by {painting.artist || "Unknown"} */}
+              <span className="artist-name" />
+              <span className="pen-card-curation">
+                Original Piece
               </span>
-              <span className="pen-card-curation">Original Piece</span>
             </div>
+
+            {/* DELETE BUTTON: BOTTOM RIGHT */}
+            {isAuthorized && (
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  marginTop: "10px",
+                  paddingBottom: "5px",
+                  position: "relative",
+                  zIndex: 10,
+                }}
+              >
+                <motion.button
+                  type="button"
+                  className="delete-arts-btn"
+                  whileHover={{
+                    scale: isDeleting ? 1 : 1.05,
+                  }}
+                  whileTap={{
+                    scale: isDeleting ? 1 : 0.95,
+                  }}
+                  disabled={isDeleting}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteClick(painting);
+                  }}
+                  style={{
+                    padding: "6px 12px",
+                    fontSize: "12px",
+                    border: "none",
+                    borderRadius: "6px",
+                    background: "#b91c1c",
+                    color: "#ffffff",
+                    fontWeight: 600,
+                    cursor: isDeleting
+                      ? "not-allowed"
+                      : "pointer",
+                    opacity: isDeleting ? 0.6 : 1,
+                  }}
+                >
+                  {isDeleting ? "Deleting..." : "🗑 Delete"}
+                </motion.button>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Dynamic 3D Floor Shadow */}
+        {/* FLOOR SHADOW */}
         <div
           className="pen-card-floor-shadow"
           style={{
-            transform: `translateX(${-rotateY * 1.5}px) translateY(${rotateX * 1.2}px)`,
+            transform: `translateX(${-rotateY * 1.5}px)
+              translateY(${rotateX * 1.2}px)`,
             opacity: isHovered ? 0.95 : 0.45,
-            filter: isHovered ? "blur(18px)" : "blur(12px)",
+            filter: isHovered
+              ? "blur(18px)"
+              : "blur(12px)",
           }}
         />
       </motion.div>
@@ -315,24 +279,149 @@ const PenCard3D = ({ painting, index, navigate, trimWords }) => {
 };
 
 /* ===================================================== */
-/* MAIN 3D PEN SKETCHES GALLERY PAGE                     */
+/* PEN SKETCHES GALLERY */
 /* ===================================================== */
+
 const PenSketches = () => {
   const navigate = useNavigate();
 
+  const [arts, setArts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [deletingId, setDeletingId] = useState(null);
+
+  /* AUTHORIZATION */
+  const username = sessionStorage.getItem("username");
+  const password = sessionStorage.getItem("password");
+
+  const isAuthorized =
+    username === "harsh" && password === "harsh123";
+
+  /* FETCH PEN ARTWORKS */
+  const fetchArts = () => {
+    setLoading(true);
+    setError("");
+
+    fetch("http://localhost:8081/api/getPenSketches")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to fetch pen artworks");
+        }
+
+        return response.json();
+      })
+      .then((data) => {
+        setArts(data);
+      })
+      .catch((err) => {
+        console.error("Error fetching pen artworks:", err);
+        setError("Unable to load pen artworks.");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    fetchArts();
+  }, []);
+
+  /* DELETE PEN ARTWORK */
+  const handleDeleteClick = async (painting) => {
+    if (!isAuthorized || !painting?.id) {
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${
+        painting.title || "this pen artwork"
+      }"?`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    setDeletingId(painting.id);
+    setError("");
+
+    try {
+      const response = await fetch(
+        `http://localhost:8081/api/deletePenSketches/${encodeURIComponent(
+          painting.id
+        )}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (!response.ok) {
+        const message = await response.text().catch(() => "");
+        throw new Error(
+          message || "Failed to delete pen artwork"
+        );
+      }
+
+      setArts((prevArts) =>
+        prevArts.filter((art) => art.id !== painting.id)
+      );
+    } catch (err) {
+      console.error("Error deleting pen artwork:", err);
+      window.alert(
+        err.message || "Unable to delete pen artwork."
+      );
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  /* TRIM DESCRIPTION */
   const trimWords = (text = "", wordLimit = 15) => {
-    const words = text.split(" ");
+    const words = text.split(/\s+/);
+
     return words.length > wordLimit
       ? words.slice(0, wordLimit).join(" ") + "..."
       : text;
   };
 
+  /* LOADING */
+  if (loading) {
+    return (
+      <div className="background pen-gallery-3d-root">
+        <h2>Loading pen artworks...</h2>
+      </div>
+    );
+  }
+
+  /* ERROR */
+  if (error && arts.length === 0) {
+    return (
+      <div className="background pen-gallery-3d-root">
+        <h2>{error}</h2>
+
+        <button type="button" onClick={fetchArts}>
+          Try Again
+        </button>
+
+        {isAuthorized && (
+          <button
+            type="button"
+            className="add-arts-btn"
+            onClick={() => navigate("/addImages/addPen")}
+          >
+            Add Pen Art
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  /* MAIN UI */
   return (
     <div className="background pen-gallery-3d-root">
-      {/* Volumetric Overhead Gallery Spotlight */}
       <div className="pen-spotlight-beam" />
 
-      {/* Hero / Header Section */}
+      {/* HERO */}
       <motion.div
         className="hero-content pen-hero-3d"
         initial="hidden"
@@ -340,9 +429,7 @@ const PenSketches = () => {
         variants={{
           hidden: {},
           visible: {
-            transition: {
-              staggerChildren: 0.2,
-            },
+            transition: { staggerChildren: 0.2 },
           },
         }}
       >
@@ -358,7 +445,6 @@ const PenSketches = () => {
           <span>Curated Exhibition • Fine Ink & Pen</span>
         </motion.div>
 
-        {/* EXACT ORIGINAL TITLE */}
         <motion.h1
           className="side font pen-title-3d"
           variants={{
@@ -367,7 +453,7 @@ const PenSketches = () => {
           }}
           transition={{ duration: 0.9, ease: "easeOut" }}
         >
-          Pen sketches
+          Pen Sketches
         </motion.h1>
 
         <motion.p
@@ -378,21 +464,41 @@ const PenSketches = () => {
           }}
           transition={{ duration: 0.9, ease: "easeOut" }}
         >
-          Intricate cross-hatching, lifelike chiaroscuro, and expressive ball pen illustrations.
+          Intricate cross-hatching, lifelike chiaroscuro,
+          and expressive ball pen illustrations.
         </motion.p>
 
-        <motion.div
-          className="pen-hint-banner"
-          variants={{
-            hidden: { y: 20, opacity: 0 },
-            visible: { y: 0, opacity: 1 },
-          }}
-          transition={{ duration: 0.9, ease: "easeOut" }}
-        >
-             </motion.div>
+        {/* ADD PEN BUTTON */}
+        {isAuthorized && (
+          <motion.div
+            className="pen-hint-banner"
+            variants={{
+              hidden: { y: 20, opacity: 0 },
+              visible: { y: 0, opacity: 1 },
+            }}
+            transition={{ duration: 0.9, ease: "easeOut" }}
+          >
+            <motion.button
+              type="button"
+              className="add-arts-btn"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => navigate("/addImages/addPen")}
+            >
+              Add Pen Art
+            </motion.button>
+          </motion.div>
+        )}
       </motion.div>
 
-      {/* 3D Gallery Grid */}
+      {/* SHOW DELETE ERROR WITHOUT HIDING THE GALLERY */}
+      {error && (
+        <p role="alert" style={{ textAlign: "center" }}>
+          {error}
+        </p>
+      )}
+
+      {/* ART GRID */}
       <motion.div
         className="gallery-container top pen-grid-3d"
         initial="hidden"
@@ -404,15 +510,22 @@ const PenSketches = () => {
           },
         }}
       >
-        {Pen.map((painting, index) => (
-          <PenCard3D
-            key={painting.id || index}
-            painting={painting}
-            index={index}
-            navigate={navigate}
-            trimWords={trimWords}
-          />
-        ))}
+        {arts.length === 0 ? (
+          <p>No pen artworks found.</p>
+        ) : (
+          arts.map((painting, index) => (
+            <PenCard3D
+              key={painting.id || index}
+              painting={painting}
+              index={index}
+              navigate={navigate}
+              trimWords={trimWords}
+              isAuthorized={isAuthorized}
+              deletingId={deletingId}
+              handleDeleteClick={handleDeleteClick}
+            />
+          ))
+        )}
       </motion.div>
     </div>
   );

@@ -53,12 +53,13 @@ const Header = () => {
       ],
     },
     { name: "Let's Connect", path: "/lets-connect" },
+      { name: "Login", path: "/login" },
   ];
 
   return (
     <>
       {/* HEADER */}
-      <motion.header
+      <motion.header 
         className={`site-header black ${isHome || isArtGallery || isShop || isContact || isShopDetail
           ? "home-header"
           : "inner-header"

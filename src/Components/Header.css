@@ -6,6 +6,7 @@
   display: flex;
   gap: 24px;
   align-items: center;
+  position: sticky;
 }
 
 .nav-link {

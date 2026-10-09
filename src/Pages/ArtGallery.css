@@ -1,4 +1,4 @@
-/* Gallery Wrapper */
+Gallery Wrapper
 .gallery-wrapper {
   min-height: 100vh;
   padding: 2rem;
@@ -783,4 +783,439 @@
     text-align: center;
     justify-content: center;
   }
+}
+
+/* 3D Scene Stage & Environment */
+.gallery-3d-scene {
+  min-height: 100vh;
+  background: radial-gradient(circle at 50% 10%, #171520 0%, #0c0a10 60%, #060508 100%);
+  color: #ffffff;
+  padding: 60px 30px 100px;
+  position: relative;
+  overflow-x: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Background Atmosphere */
+.ambient-glow {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  filter: blur(140px);
+  pointer-events: none;
+  opacity: 0.25;
+  z-index: 0;
+}
+.glow-1 {
+  top: 5%;
+  left: 15%;
+  background: #a855f7;
+}
+.glow-2 {
+  top: 40%;
+  right: 10%;
+  background: #3b82f6;
+}
+
+/* Header */
+.gallery-header {
+  text-align: center;
+  margin-bottom: 60px;
+  position: relative;
+  z-index: 1;
+}
+.gallery-tagline {
+  letter-spacing: 4px;
+  font-size: 0.85rem;
+  color: #c084fc;
+  text-transform: uppercase;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.gallery-heading {
+  font-size: clamp(2.2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  letter-spacing: -1px;
+  background: linear-gradient(135deg, #ffffff 40%, #a855f7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* 3D Perspective Container Grid */
+.gallery-container-3d {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 40px;
+  max-width: 1300px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+  /* Key 3D Perspective Setup */
+  perspective: 1200px;
+}
+
+/* Card 3D Wrapper */
+.card-3d-wrapper {
+  perspective: 1000px;
+}
+
+/* 3D Tilt Card */
+.art-card-3d {
+  position: relative;
+  background: rgba(26, 23, 36, 0.7);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  padding: 16px;
+  cursor: pointer;
+  transform-style: preserve-3d;
+  will-change: transform;
+  box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.6),
+              0 0 0 1px rgba(255, 255, 255, 0.05);
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.art-card-3d:hover {
+  box-shadow: 0 30px 60px -15px rgba(168, 85, 247, 0.25),
+              0 0 30px -5px rgba(168, 85, 247, 0.15);
+  border-color: rgba(168, 85, 247, 0.4);
+}
+
+/* Dynamic Specular Sheen */
+.card-glare {
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  pointer-events: none;
+  z-index: 10;
+  transition: opacity 0.3s ease;
+}
+
+/* 3D Elevated Image Layer */
+.card-image-container-3d {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  border-radius: 14px;
+  overflow: hidden;
+  /* Push image outward in 3D space */
+  transform: translateZ(35px);
+  transform-style: preserve-3d;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+.card-image-3d {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.art-card-3d:hover .card-image-3d {
+  transform: scale(1.06);
+}
+
+/* Overlay & Button */
+.image-overlay-3d {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(12, 10, 16, 0.85) 0%, transparent 60%);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 24px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.art-card-3d:hover .image-overlay-3d {
+  opacity: 1;
+}
+
+/* Floating Action Button (Pops further in Z-axis) */
+.view-details-btn-3d {
+  background: #ffffff;
+  color: #0c0a10;
+  padding: 10px 22px;
+  border-radius: 30px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: 0.5px;
+  /* Highest 3D elevation */
+  transform: translateZ(50px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* 3D Elevated Content */
+.card-content-3d {
+  padding: 18px 8px 6px;
+  /* Middle 3D elevation */
+  transform: translateZ(25px);
+}
+
+.card-title-3d {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #f1f5f9;
+  transition: color 0.3s ease;
+}
+
+.art-card-3d:hover .card-title-3d {
+  color: #c084fc;
+}
+
+.card-description-3d {
+  font-size: 0.9rem;
+  color: #94a3b8;
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+/* Footer Details */
+.card-footer-3d {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 12px;
+}
+
+.artist-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #e2e8f0;
+}
+
+.artist-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #a855f7;
+  box-shadow: 0 0 8px #a855f7;
+}
+
+.artwork-index {
+  font-size: 0.8rem;
+  font-family: monospace;
+  color: #64748b;
+}
+
+/* Page Wrapper with Deep Space Background */
+.art-gallery-page {
+  position: relative;
+  min-height: 100vh;
+  background: radial-gradient(ellipse at 50% 0%, #0c081e 0%, #05030d 50%, #010005 100%);
+  color: #ffffff;
+  padding: 60px 24px 100px;
+  overflow-x: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Fullscreen Canvas for Twinkling Stars and Shooting Meteors */
+.starry-sky-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* Prevents canvas from blocking mouse */
+  z-index: 1;
+}
+
+/* Cosmic Nebula Clouds */
+.nebula-cloud {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(150px);
+  pointer-events: none;
+  opacity: 0.22;
+  z-index: 0;
+}
+
+.nebula-purple {
+  top: 5%;
+  left: 15%;
+  width: 600px;
+  height: 600px;
+  background: #7c3aed;
+}
+
+.nebula-cyan {
+  top: 45%;
+  right: 10%;
+  width: 500px;
+  height: 500px;
+  background: #0284c7;
+}
+
+.nebula-pink {
+  bottom: 5%;
+  left: 30%;
+  width: 550px;
+  height: 550px;
+  background: #ec4899;
+  opacity: 0.15;
+}
+
+/* Header */
+.gallery-header-section {
+  text-align: center;
+  margin-bottom: 50px;
+  position: relative;
+  z-index: 2;
+}
+
+.sky-subtitle {
+  font-size: 0.85rem;
+  letter-spacing: 5px;
+  color: #c084fc;
+  font-weight: 600;
+  margin-bottom: 10px;
+  text-shadow: 0 0 12px rgba(192, 132, 252, 0.6);
+}
+
+.sky-title {
+  font-size: clamp(2.2rem, 5vw, 3.8rem);
+  font-weight: 800;
+  letter-spacing: -1px;
+  margin: 0;
+  background: linear-gradient(135deg, #ffffff 40%, #c084fc 80%, #60a5fa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 20px rgba(192, 132, 252, 0.25));
+}
+
+/* Gallery Grid */
+.gallery-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 36px;
+  max-width: 1280px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+/* Stable, Shake-Free Glassmorphic Art Card */
+.art-card {
+  position: relative;
+  background: rgba(18, 14, 30, 0.7);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 22px;
+  padding: 16px;
+  cursor: pointer;
+  box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.8);
+  /* Smooth color/glow transitions only — NO geometric jumping */
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Gentle, rock-steady glow on hover (NO scaling or jumping) */
+.art-card:hover {
+  background: rgba(26, 20, 42, 0.8);
+  border-color: rgba(192, 132, 252, 0.6);
+  box-shadow: 0 15px 40px -10px rgba(168, 85, 247, 0.35),
+              0 0 20px rgba(168, 85, 247, 0.15);
+}
+
+/* Image Container */
+.card-image-container {
+  position: relative;
+  width: 100%;
+  height: 290px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #0d0b16;
+}
+
+/* Fixed Image (Removed the shaky transform scale) */
+.card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+}
+
+/* Image Overlay (Smooth Fade, No Jitter) */
+.image-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(8, 5, 15, 0.8) 0%, transparent 70%);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 22px;
+  opacity: 0;
+  pointer-events: none; /* Prevents cursor flicker */
+  transition: opacity 0.25s ease;
+}
+
+.art-card:hover .image-overlay {
+  opacity: 1;
+}
+
+/* Button */
+.view-details-btn {
+  background: #ffffff;
+  color: #0c081e;
+  padding: 10px 22px;
+  border-radius: 30px;
+  font-weight: 700;
+  font-size: 0.88rem;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+}
+
+/* Card Content */
+.card-content {
+  padding: 16px 6px 4px;
+}
+
+.card-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+  color: #f8fafc;
+  transition: color 0.2s ease;
+}
+
+.art-card:hover .card-title {
+  color: #c084fc;
+}
+
+.card-description {
+  font-size: 0.88rem;
+  color: #94a3b8;
+  line-height: 1.5;
+  margin: 0 0 16px 0;
+}
+
+/* Card Footer */
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 12px;
+}
+
+.artist-name {
+  font-size: 0.84rem;
+  color: #cbd5e1;
+  font-weight: 500;
+}
+
+.star-constellation-icon {
+  color: #c084fc;
+  font-size: 1rem;
+  text-shadow: 0 0 8px #c084fc;
 }
