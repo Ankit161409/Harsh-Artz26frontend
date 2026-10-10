@@ -361,7 +361,7 @@ const CharcoalSketches = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:8081/api/deletecharcoal/${encodeURIComponent(id)}`,
+        `https://harsh-arts-backend-2.onrender.com/api/deletecharcoal/${encodeURIComponent(id)}`,
         {
           method: "DELETE",
         }
