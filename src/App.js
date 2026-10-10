@@ -21,6 +21,7 @@ import AddImage from './AddImages/AddImages';
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import 'bootstrap/dist/css/bootstrap.min.css';
+import PaintingDetails from './Pages/PaintingDetails';
 
 
 
@@ -46,7 +47,8 @@ function App() {
           <Route path="/watercolor-paintings" element={<WatercolorPaintings />} />
           <Route path="/login" element={<Login />} />
           <Route path="/addImages/:painting" element={<AddImage/>} />
-
+<Route path="/paintingDetails/:apiType/:id"  element={<PaintingDetails/>}
+/>
 
 
 
