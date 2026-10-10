@@ -347,7 +347,7 @@ const PenSketches = () => {
 
     try {
       const response = await fetch(
-        `https://harsh-arts-backend-2.onrender.com/api/deletePenSketches/${encodeURIComponent(
+        `https://harsh-arts-backend-2.onrender.com/api/deletePen/${encodeURIComponent(
           painting.id
         )}`,
         {
