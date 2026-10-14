@@ -598,7 +598,7 @@ const PenCard3D = ({
     }
 
     navigate(
-      `/painting/Pen/${encodeURIComponent(paintingId)}`
+      `/painting/getPenSketchById/${encodeURIComponent(paintingId)}`
     );
   };
 
