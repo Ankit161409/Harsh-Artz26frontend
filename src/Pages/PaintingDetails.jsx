@@ -3,10 +3,9 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import "./ArtGallery.css";
 
-const API_BASE_URL = (
-  import.meta.env.VITE_API_BASE_URL ||
-  "https://harsh-arts-backend-2.onrender.com"
-).replace(/\/+$/, "");
+const API_BASE_URL = 
+  "https://harsh-arts-backend-2.onrender.com";
+ 
 
 /* ✅ Map apiType to Spring Boot endpoint */
 const getPaintingEndpoint = (apiType, id) => {
