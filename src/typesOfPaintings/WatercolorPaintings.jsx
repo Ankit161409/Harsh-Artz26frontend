@@ -684,7 +684,7 @@ const WatercolorCard3D = ({
       return;
     }
 
-    navigate(`/getWatercolorById/${encodeURIComponent(paintingId)}`);
+    navigate(`/paintingDetails/getWatercolorById/${encodeURIComponent(paintingId)}`);
   };
 
   const handleMouseMove = (e) => {
