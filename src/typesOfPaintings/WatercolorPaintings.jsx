@@ -751,7 +751,7 @@ const WatercolorCard3D = ({
       )}`
     );
   };
-console.log("opening watercolor jsx");
+
   // 3D tilt and glare effects.
   const handleMouseMove = (e) => {
     if (!cardRef.current) return;
@@ -1321,6 +1321,7 @@ const WatercolorPaintings = () => {
           }}
         >
           Watercolor Paintings
+          console.log("opening watercolor jsx");
         </motion.h1>
 
         <motion.p
