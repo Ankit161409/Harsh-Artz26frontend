@@ -3,9 +3,14 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import "./Gallery3D.css";
 
+const API_BASE_URL = (
+  process.env.REACT_APP_API_BASE_URL ||
+  "https://harsh-arts-backend-2.onrender.com"
+).replace(/\/+$/, "");
+
+// Individual mixed media artwork card
 const MixedMediaCard3D = ({
   painting,
-  index,
   navigate,
   trimWords,
   isAuthorized,
@@ -25,14 +30,76 @@ const MixedMediaCard3D = ({
 
   const [isHovered, setIsHovered] = useState(false);
 
-  const imageSource = painting.image
-    ? `data:image/jpeg;base64,${painting.image}`
-    : "/placeholder.jpg";
+  // Support MongoDB IDs and regular IDs.
+  const paintingId = painting.id ?? painting._id;
 
+  // Support Base64 images, data URLs, and image URLs.
+  const imageSource = (() => {
+    const rawImage =
+      painting.image ??
+      painting.img ??
+      painting.imageUrl ??
+      painting.imagePath ??
+      painting.imageData ??
+      painting.base64Image ??
+      painting.photo;
+
+    if (!rawImage) return "/placeholder.jpg";
+
+    if (typeof rawImage !== "string") {
+      return rawImage.url || rawImage.src || "/placeholder.jpg";
+    }
+
+    if (
+      rawImage.startsWith("data:") ||
+      rawImage.startsWith("http://") ||
+      rawImage.startsWith("https://") ||
+      rawImage.startsWith("/")
+    ) {
+      return rawImage;
+    }
+
+    if (rawImage.startsWith("iVBOR")) {
+      return `data:image/png;base64,${rawImage}`;
+    }
+
+    if (rawImage.startsWith("R0lGOD")) {
+      return `data:image/gif;base64,${rawImage}`;
+    }
+
+    if (rawImage.startsWith("UklGR")) {
+      return `data:image/webp;base64,${rawImage}`;
+    }
+
+    return `data:image/jpeg;base64,${rawImage}`;
+  })();
+
+  // Open the painting details page.
+  const openDetails = () => {
+    if (
+      paintingId === undefined ||
+      paintingId === null ||
+      paintingId === ""
+    ) {
+      console.error("Mixed media painting ID is missing:", painting);
+      alert("Painting ID is missing.");
+      return;
+    }
+
+    navigate(
+      `/paintingDetails/getMixedMediaById/${encodeURIComponent(
+        paintingId
+      )}`
+    );
+  };
+
+  // 3D mouse movement.
   const handleMouseMove = (e) => {
     if (!cardRef.current) return;
 
     const rect = cardRef.current.getBoundingClientRect();
+
+    if (!rect.width || !rect.height) return;
 
     const xPercent = (e.clientX - rect.left) / rect.width;
     const yPercent = (e.clientY - rect.top) / rect.height;
@@ -63,14 +130,8 @@ const MixedMediaCard3D = ({
       ref={cardRef}
       className="art-card-3d-wrapper"
       variants={{
-        hidden: {
-          y: 50,
-          opacity: 0,
-        },
-        visible: {
-          y: 0,
-          opacity: 1,
-        },
+        hidden: { y: 50, opacity: 0 },
+        visible: { y: 0, opacity: 1 },
       }}
       transition={{
         duration: 0.6,
@@ -79,9 +140,7 @@ const MixedMediaCard3D = ({
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={handleMouseLeave}
-      onClick={() =>
-        navigate(`/painting/MixedMediaImport/${painting.id}`)
-      }
+      onClick={openDetails}
       style={{
         perspective: "1000px",
         cursor: "pointer",
@@ -108,6 +167,7 @@ const MixedMediaCard3D = ({
         <div className="art-card-frame">
           <div className="art-frame-bevel" />
 
+          {/* Artwork image */}
           <div
             className="art-canvas-container"
             style={{
@@ -122,8 +182,13 @@ const MixedMediaCard3D = ({
               src={imageSource}
               alt={painting.title || "Mixed media artwork"}
               className="art-canvas-image"
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src = "/placeholder.jpg";
+              }}
             />
 
+            {/* Glare effect */}
             <div
               className="art-canvas-glare"
               style={{
@@ -137,6 +202,7 @@ const MixedMediaCard3D = ({
               }}
             />
 
+            {/* Category badge */}
             <div
               className="art-card-floating-badge"
               style={{
@@ -150,6 +216,7 @@ const MixedMediaCard3D = ({
               <span>Mixed Media</span>
             </div>
 
+            {/* View details overlay */}
             <div
               className="art-image-overlay"
               style={{
@@ -159,12 +226,8 @@ const MixedMediaCard3D = ({
             >
               <motion.div
                 className="view-details-btn"
-                whileHover={{
-                  scale: 1.1,
-                }}
-                whileTap={{
-                  scale: 0.95,
-                }}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
                 style={{
                   transform: isHovered
                     ? "translateZ(60px)"
@@ -178,6 +241,7 @@ const MixedMediaCard3D = ({
             </div>
           </div>
 
+          {/* Card content */}
           <div
             className="art-card-content"
             style={{
@@ -188,94 +252,101 @@ const MixedMediaCard3D = ({
                 "transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)",
             }}
           >
-              <motion.h1
-             className="card-description"
-             style={{
-               fontFamily: '"Cormorant Garamond", Georgia, serif',
-               fontSize: "2.0rem",
-               fontWeight: 500,
-               fontStyle: "italic",
-               letterSpacing: "0.4px",
-               lineHeight: 1.6,
-               color: "#e8dcc8",
-             }}
-           >
-             {trimWords(
-               painting.title || "Original pen artwork",
-               50
-             )}
+            <motion.h1
+              className="card-description"
+              style={{
+                fontFamily: '"Cormorant Garamond", Georgia, serif',
+                fontSize: "2rem",
+                fontWeight: 500,
+                fontStyle: "italic",
+                letterSpacing: "0.4px",
+                lineHeight: 1.6,
+                color: "#e8dcc8",
+              }}
+            >
+              {trimWords(
+                painting.title || "Original mixed media artwork",
+                50
+              )}
             </motion.h1>
+
+            {painting.description && (
+              <p className="card-description">
+                {trimWords(painting.description, 25)}
+              </p>
+            )}
 
             <div className="card-footer">
               <span className="artist-name" />
-
-              <span className="card-curation">
-                Original Piece
-              </span>
+              <span className="card-curation">Original Piece</span>
             </div>
-          </div>
 
-          {/* DELETE BUTTON - BOTTOM RIGHT */}
-          {isAuthorized && (
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "flex-end",
-                marginTop: "10px",
-                padding: "0 10px 8px",
-                position: "relative",
-                zIndex: 10,
-              }}
-            >
-              <motion.button
-                type="button"
-                className="delete-arts-btn"
-                whileHover={{
-                  scale:
-                    deletingId === painting.id ? 1 : 1.05,
-                }}
-                whileTap={{
-                  scale:
-                    deletingId === painting.id ? 1 : 0.95,
-                }}
-                disabled={deletingId === painting.id}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDelete(painting.id);
-                }}
+            {/* Delete button */}
+            {isAuthorized && (
+              <div
                 style={{
-                  padding: "6px 12px",
-                  fontSize: "12px",
-                  border: "none",
-                  borderRadius: "6px",
-                  background: "#b91c1c",
-                  color: "#ffffff",
-                  fontWeight: 600,
-                  cursor:
-                    deletingId === painting.id
-                      ? "not-allowed"
-                      : "pointer",
-                  opacity:
-                    deletingId === painting.id ? 0.6 : 1,
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  alignItems: "center",
+                  marginTop: "15px",
+                  paddingBottom: "5px",
+                  position: "relative",
+                  zIndex: 10,
                 }}
               >
-                {deletingId === painting.id
-                  ? "Deleting..."
-                  : "🗑 Delete"}
-              </motion.button>
-            </div>
-          )}
+                <motion.button
+                  type="button"
+                  className="delete-arts-btn"
+                  whileHover={{
+                    scale:
+                      String(deletingId) === String(paintingId)
+                        ? 1
+                        : 1.05,
+                  }}
+                  whileTap={{
+                    scale:
+                      String(deletingId) === String(paintingId)
+                        ? 1
+                        : 0.95,
+                  }}
+                  disabled={
+                    String(deletingId) === String(paintingId)
+                  }
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete(paintingId);
+                  }}
+                  style={{
+                    padding: "9px 18px",
+                    border: "none",
+                    borderRadius: "8px",
+                    background: "#dc2626",
+                    color: "#fff",
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    opacity:
+                      String(deletingId) === String(paintingId)
+                        ? 0.6
+                        : 1,
+                  }}
+                >
+                  {String(deletingId) === String(paintingId)
+                    ? "Deleting..."
+                    : "🗑 Delete"}
+                </motion.button>
+              </div>
+            )}
+          </div>
         </div>
 
+        {/* Floor shadow */}
         <div
           className="art-card-floor-shadow"
           style={{
             transform: `translateX(${-rotateY * 1.5}px)
-                        translateY(${rotateX * 1.2}px)`,
+              translateY(${rotateX * 1.2}px)`,
             opacity: isHovered ? 0.95 : 0.45,
-            filter: isHovered
-              ? "blur(18px)"
-              : "blur(12px)",
+            filter: isHovered ? "blur(18px)" : "blur(12px)",
           }}
         />
       </motion.div>
@@ -283,6 +354,7 @@ const MixedMediaCard3D = ({
   );
 };
 
+// Main mixed media gallery
 const MixedMedia = () => {
   const navigate = useNavigate();
 
@@ -291,83 +363,125 @@ const MixedMedia = () => {
   const [error, setError] = useState("");
   const [deletingId, setDeletingId] = useState(null);
 
-  // AUTHORIZATION
+  // Existing authorization check.
   const username = sessionStorage.getItem("username");
   const password = sessionStorage.getItem("password");
 
   const isAuthorized =
     username === "harsh" && password === "harsh123";
 
-  // FETCH MIXED MEDIA ARTWORKS
+  // Fetch all mixed media artworks.
   useEffect(() => {
+    const controller = new AbortController();
+
     const fetchArts = async () => {
       try {
+        setLoading(true);
+        setError("");
+
         const response = await fetch(
-          "https://harsh-arts-backend-2.onrender.com/api/getMixedMedia"
+          `${API_BASE_URL}/api/getMixedMedia`,
+          { signal: controller.signal }
         );
 
         if (!response.ok) {
-          throw new Error("Failed to fetch mixed media artworks");
+          throw new Error(
+            `Failed to fetch mixed media artworks (${response.status})`
+          );
         }
 
         const data = await response.json();
+
+        if (!Array.isArray(data)) {
+          throw new Error(
+            "The API did not return a list of mixed media artworks."
+          );
+        }
+
         setArts(data);
       } catch (err) {
-        console.error("Error fetching mixed media artworks:", err);
-        setError("Unable to load mixed media artworks from server , server not running..");
+        if (err.name !== "AbortError") {
+          console.error("Fetch mixed media error:", err);
+
+          setError(
+            err.message ||
+              "Unable to load mixed media artworks. Check your backend."
+          );
+        }
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
       }
     };
 
     fetchArts();
+
+    return () => controller.abort();
   }, []);
 
-  // DELETE MIXED MEDIA ARTWORK
+  // Delete a mixed media artwork.
   const handleDelete = async (id) => {
-    if (!id || deletingId !== null) return;
+    if (!isAuthorized) {
+      alert("You are not authorized to delete artworks.");
+      return;
+    }
+
+    if (id === undefined || id === null || id === "") {
+      alert("Artwork ID is missing.");
+      return;
+    }
+
+    if (deletingId !== null) return;
 
     const confirmed = window.confirm(
-      "Are you sure you want to delete this artwork?"
+      "Are you sure you want to delete this mixed media artwork?"
     );
 
     if (!confirmed) return;
 
     setDeletingId(id);
+    setError("");
 
     try {
       const response = await fetch(
-        `https://harsh-arts-backend-2.onrender.com/api/deleteMixedMedia/${id}`,
-        {
-          method: "DELETE",
-        }
+        `${API_BASE_URL}/api/deleteMixedMedia/${encodeURIComponent(id)}`,
+        { method: "DELETE" }
       );
 
       if (!response.ok) {
-        throw new Error("Failed to delete mixed media artwork");
+        throw new Error(
+          `Failed to delete mixed media artwork (${response.status})`
+        );
       }
 
-      setArts((prevArts) =>
-        prevArts.filter((art) => art.id !== id)
+      setArts((previousArts) =>
+        previousArts.filter(
+          (art) => String(art.id ?? art._id) !== String(id)
+        )
       );
     } catch (err) {
-      console.error("Error deleting mixed media artwork:", err);
-      window.alert("Unable to delete the artwork. Please try again.");
+      console.error("Delete mixed media error:", err);
+
+      alert(
+        err.message ||
+          "Unable to delete the artwork. Please try again."
+      );
     } finally {
       setDeletingId(null);
     }
   };
 
-  // TRIM DESCRIPTION
+  // Trim long text.
   const trimWords = (text = "", wordLimit = 15) => {
-    const words = text.split(/\s+/);
+    const words = String(text).split(/\s+/);
 
     return words.length > wordLimit
       ? words.slice(0, wordLimit).join(" ") + "..."
       : text;
   };
 
-  // LOADING
+  // Loading screen.
   if (loading) {
     return (
       <div className="background gallery-3d-root">
@@ -376,11 +490,18 @@ const MixedMedia = () => {
     );
   }
 
-  // ERROR
-  if (error) {
+  // Fetch error screen.
+  if (error && arts.length === 0) {
     return (
       <div className="background gallery-3d-root">
         <h2>{error}</h2>
+
+        <button
+          type="button"
+          onClick={() => window.location.reload()}
+        >
+          Try Again
+        </button>
       </div>
     );
   }
@@ -389,7 +510,7 @@ const MixedMedia = () => {
     <div className="background gallery-3d-root">
       <div className="gallery-spotlight-beam" />
 
-      {/* HERO SECTION */}
+      {/* Hero section */}
       <motion.div
         className="hero-content gallery-hero-3d"
         initial="hidden"
@@ -397,28 +518,17 @@ const MixedMedia = () => {
         variants={{
           hidden: {},
           visible: {
-            transition: {
-              staggerChildren: 0.2,
-            },
+            transition: { staggerChildren: 0.2 },
           },
         }}
       >
         <motion.div
           className="gallery-badge-pill"
           variants={{
-            hidden: {
-              y: 25,
-              opacity: 0,
-            },
-            visible: {
-              y: 0,
-              opacity: 1,
-            },
+            hidden: { y: 25, opacity: 0 },
+            visible: { y: 0, opacity: 1 },
           }}
-          transition={{
-            duration: 0.8,
-            ease: "easeOut",
-          }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
         >
           <span className="gallery-badge-dot" />
           <span>Curated Exhibition • Mixed Media</span>
@@ -427,19 +537,10 @@ const MixedMedia = () => {
         <motion.h1
           className="side font gallery-title-3d"
           variants={{
-            hidden: {
-              y: 35,
-              opacity: 0,
-            },
-            visible: {
-              y: 0,
-              opacity: 1,
-            },
+            hidden: { y: 35, opacity: 0 },
+            visible: { y: 0, opacity: 1 },
           }}
-          transition={{
-            duration: 0.9,
-            ease: "easeOut",
-          }}
+          transition={{ duration: 0.9, ease: "easeOut" }}
         >
           Mixed Media Artworks
         </motion.h1>
@@ -447,57 +548,52 @@ const MixedMedia = () => {
         <motion.p
           className="gallery-subtitle-3d"
           variants={{
-            hidden: {
-              y: 30,
-              opacity: 0,
-            },
-            visible: {
-              y: 0,
-              opacity: 1,
-            },
+            hidden: { y: 30, opacity: 0 },
+            visible: { y: 0, opacity: 1 },
           }}
-          transition={{
-            duration: 0.9,
-            ease: "easeOut",
-          }}
+          transition={{ duration: 0.9, ease: "easeOut" }}
         >
           A creative fusion of textures, materials, colors,
           and techniques that transforms imagination into art.
         </motion.p>
 
-        {/* ADD ARTS BUTTON */}
-        <motion.div
-          variants={{
-            hidden: {
-              y: 20,
-              opacity: 0,
-            },
-            visible: {
-              y: 0,
-              opacity: 1,
-            },
-          }}
-          transition={{
-            duration: 0.9,
-            ease: "easeOut",
-          }}
-        >
-          {isAuthorized && (
+        {/* Add artworks button */}
+        {isAuthorized && (
+          <motion.div
+            variants={{
+              hidden: { y: 20, opacity: 0 },
+              visible: { y: 0, opacity: 1 },
+            }}
+            transition={{ duration: 0.9, ease: "easeOut" }}
+          >
             <motion.button
+              type="button"
               className="add-arts-btn"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() =>
-                navigate("/addImages/addMixedMedia")
-              }
+              onClick={() => navigate("/addImages/addMixedMedia")}
             >
               Add Arts
             </motion.button>
-          )}
-        </motion.div>
+          </motion.div>
+        )}
       </motion.div>
 
-      {/* ART GRID */}
+      {/* Non-blocking error message */}
+      {error && (
+        <p
+          role="alert"
+          style={{
+            color: "#ff6b6b",
+            textAlign: "center",
+            margin: "20px",
+          }}
+        >
+          {error}
+        </p>
+      )}
+
+      {/* Artwork grid */}
       <motion.div
         className="gallery-container top gallery-grid-3d"
         initial="hidden"
@@ -505,9 +601,7 @@ const MixedMedia = () => {
         variants={{
           hidden: {},
           visible: {
-            transition: {
-              staggerChildren: 0.08,
-            },
+            transition: { staggerChildren: 0.08 },
           },
         }}
       >
@@ -516,7 +610,7 @@ const MixedMedia = () => {
         ) : (
           arts.map((painting, index) => (
             <MixedMediaCard3D
-              key={painting.id || index}
+              key={painting.id ?? painting._id ?? index}
               painting={painting}
               index={index}
               navigate={navigate}
