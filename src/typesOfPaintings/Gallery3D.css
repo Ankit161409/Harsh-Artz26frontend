@@ -354,7 +354,7 @@
 
 .video-loader-content {
   width: min(420px, 90vw);
-  max-height: 50vh;
+  max-height: 100vh;
   object-fit: contain;
   border-radius: 14px;
   box-shadow: 0 0 35px rgba(212, 175, 55, 0.15);
