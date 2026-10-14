@@ -3,9 +3,14 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import "./Gallery3D.css";
 
+const API_BASE_URL = (
+  import.meta.env.VITE_API_BASE_URL ||
+  "https://harsh-arts-backend-2.onrender.com"
+).replace(/\/+$/, "");
+
+// Individual digital artwork card
 const DigitalArtCard3D = ({
   painting,
-  index,
   navigate,
   trimWords,
   isAuthorized,
@@ -25,14 +30,89 @@ const DigitalArtCard3D = ({
 
   const [isHovered, setIsHovered] = useState(false);
 
-  const imageSource = painting.image
-    ? `data:image/jpeg;base64,${painting.image}`
-    : "/placeholder.jpg";
+  // Support both id and _id.
+  const paintingId = painting.id ?? painting._id;
+
+  // Support Base64 images and image URLs.
+  const getImageSource = () => {
+    const rawImage =
+      painting.image ??
+      painting.img ??
+      painting.imageUrl ??
+      painting.imagePath ??
+      painting.imageData ??
+      painting.base64Image ??
+      painting.photo;
+
+    if (!rawImage) return "/placeholder.jpg";
+
+    if (typeof rawImage === "object") {
+      return (
+        rawImage.url ||
+        rawImage.src ||
+        rawImage.default ||
+        "/placeholder.jpg"
+      );
+    }
+
+    if (typeof rawImage !== "string") {
+      return "/placeholder.jpg";
+    }
+
+    if (
+      rawImage.startsWith("http://") ||
+      rawImage.startsWith("https://") ||
+      rawImage.startsWith("data:")
+    ) {
+      return rawImage;
+    }
+
+    if (rawImage.startsWith("/9j/")) {
+      return `data:image/jpeg;base64,${rawImage}`;
+    }
+
+    if (rawImage.startsWith("iVBOR")) {
+      return `data:image/png;base64,${rawImage}`;
+    }
+
+    if (rawImage.startsWith("R0lGOD")) {
+      return `data:image/gif;base64,${rawImage}`;
+    }
+
+    if (rawImage.startsWith("UklGR")) {
+      return `data:image/webp;base64,${rawImage}`;
+    }
+
+    return `data:image/jpeg;base64,${rawImage}`;
+  };
+
+  const imageSource = getImageSource();
+
+  // Navigate to the digital artwork details page.
+  const openDetails = () => {
+    if (
+      paintingId === undefined ||
+      paintingId === null ||
+      paintingId === ""
+    ) {
+      console.error("Digital artwork ID is missing:", painting);
+      alert("Digital artwork ID is missing.");
+      return;
+    }
+
+    navigate(
+      `/paintingDetails/getDigitalArtById/${encodeURIComponent(
+        paintingId
+      )}`
+    );
+  };
 
   const handleMouseMove = (e) => {
     if (!cardRef.current) return;
 
     const rect = cardRef.current.getBoundingClientRect();
+
+    if (!rect.width || !rect.height) return;
 
     const xPercent = (e.clientX - rect.left) / rect.width;
     const yPercent = (e.clientY - rect.top) / rect.height;
@@ -58,24 +138,13 @@ const DigitalArtCard3D = ({
     }));
   };
 
-  const handleDeleteClick = (e) => {
-    e.stopPropagation();
-    onDelete(painting.id);
-  };
-
   return (
     <motion.div
       ref={cardRef}
       className="art-card-3d-wrapper"
       variants={{
-        hidden: {
-          y: 50,
-          opacity: 0,
-        },
-        visible: {
-          y: 0,
-          opacity: 1,
-        },
+        hidden: { y: 50, opacity: 0 },
+        visible: { y: 0, opacity: 1 },
       }}
       transition={{
         duration: 0.6,
@@ -84,9 +153,7 @@ const DigitalArtCard3D = ({
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={handleMouseLeave}
-      onClick={() =>
-        navigate(`/painting/DigitalArtImport/${painting.id}`)
-      }
+      onClick={openDetails}
       style={{
         perspective: "1000px",
         cursor: "pointer",
@@ -113,7 +180,7 @@ const DigitalArtCard3D = ({
         <div className="art-card-frame">
           <div className="art-frame-bevel" />
 
-          {/* IMAGE */}
+          {/* Artwork image */}
           <div
             className="art-canvas-container"
             style={{
@@ -128,9 +195,14 @@ const DigitalArtCard3D = ({
               src={imageSource}
               alt={painting.title || "Digital artwork"}
               className="art-canvas-image"
+              onError={(e) => {
+                if (!e.currentTarget.src.endsWith("/placeholder.jpg")) {
+                  e.currentTarget.src = "/placeholder.jpg";
+                }
+              }}
             />
 
-            {/* GLARE */}
+            {/* Glare effect */}
             <div
               className="art-canvas-glare"
               style={{
@@ -144,7 +216,7 @@ const DigitalArtCard3D = ({
               }}
             />
 
-            {/* CATEGORY BADGE */}
+            {/* Category badge */}
             <div
               className="art-card-floating-badge"
               style={{
@@ -158,7 +230,7 @@ const DigitalArtCard3D = ({
               <span>Digital Art</span>
             </div>
 
-            {/* VIEW DETAILS */}
+            {/* View details overlay */}
             <div
               className="art-image-overlay"
               style={{
@@ -174,8 +246,7 @@ const DigitalArtCard3D = ({
                   transform: isHovered
                     ? "translateZ(60px)"
                     : "translateZ(20px)",
-                  transition:
-                    "transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)",
+                  transition: "transform 0.4s ease",
                 }}
               >
                 View Details
@@ -183,34 +254,33 @@ const DigitalArtCard3D = ({
             </div>
           </div>
 
-          {/* CARD CONTENT */}
+          {/* Card content */}
           <div
             className="art-card-content"
             style={{
               transform: isHovered
                 ? "translateZ(24px)"
                 : "translateZ(0px)",
-              transition:
-                "transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)",
+              transition: "transform 0.4s ease",
             }}
           >
             <motion.h1
-           className="card-description"
-           style={{
-             fontFamily: '"Cormorant Garamond", Georgia, serif',
-             fontSize: "2.0rem",
-             fontWeight: 500,
-             fontStyle: "italic",
-             letterSpacing: "0.4px",
-             lineHeight: 1.6,
-             color: "#e8dcc8",
-           }}
-         >
-           {trimWords(
-             painting.title || "Original pen artwork",
-             50
-           )}
-          </motion.h1>
+              className="card-title"
+              whileHover={{ color: "#d4af37" }}
+            >
+              {trimWords(
+                painting.title || "Untitled Digital Artwork",
+                50
+              )}
+            </motion.h1>
+
+            <p className="card-description">
+              {trimWords(
+                painting.description ||
+                  "Original digital artwork",
+                50
+              )}
+            </p>
 
             <div className="card-footer">
               <span className="artist-name" />
@@ -219,66 +289,65 @@ const DigitalArtCard3D = ({
               </span>
             </div>
 
-            {/* DELETE BUTTON - BOTTOM RIGHT */}
+            {/* Delete button */}
             {isAuthorized && (
-               <div
-                          style={{
-                            display: "flex",
-                            justifyContent: "flex-end",
-                            alignItems: "center",
-                            marginTop: "15px",
-                            paddingBottom: "5px",
-                          }}
-                        >
-                          <motion.button
-                            type="button"
-                            className="delete-art-btn"
-                            whileHover={{
-                              scale: 1.05,
-                              backgroundColor: "#b91c1c",
-                            }}
-                            whileTap={{
-                              scale: 0.95,
-                            }}
-                            disabled={
-                              String(deletingId) === String(painting.id)
-                            }
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onDelete(painting.id);
-                            }}
-                            style={{
-                              padding: "9px 18px",
-                              border: "none",
-                              borderRadius: "8px",
-                              backgroundColor: "#dc2626",
-                              color: "#ffffff",
-                              fontWeight: 600,
-                              cursor: "pointer",
-                              opacity:
-                                String(deletingId) === String(painting.id)
-                                  ? 0.6
-                                  : 1,
-                            }}
-                          >
-                            {String(deletingId) === String(painting.id)
-                              ? "Deleting..."
-                              : "Delete"}
-                          </motion.button>
-                        </div>
-                        
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  alignItems: "center",
+                  marginTop: "15px",
+                  paddingBottom: "5px",
+                }}
+              >
+                <motion.button
+                  type="button"
+                  className="delete-art-btn"
+                  whileHover={{
+                    scale: 1.05,
+                    backgroundColor: "#b91c1c",
+                  }}
+                  whileTap={{ scale: 0.95 }}
+                  disabled={
+                    String(deletingId) === String(paintingId)
+                  }
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete(paintingId);
+                  }}
+                  style={{
+                    padding: "9px 18px",
+                    border: "none",
+                    borderRadius: "8px",
+                    backgroundColor: "#dc2626",
+                    color: "#ffffff",
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    opacity:
+                      String(deletingId) === String(paintingId)
+                        ? 0.6
+                        : 1,
+                  }}
+                >
+                  {String(deletingId) === String(paintingId)
+                    ? "Deleting..."
+                    : "Delete"}
+                </motion.button>
+              </div>
             )}
           </div>
         </div>
 
-        {/* FLOOR SHADOW */}
+        {/* Floor shadow */}
         <div
           className="art-card-floor-shadow"
           style={{
             transform: `translateX(${-rotateY * 1.5}px)
-                        translateY(${rotateX * 1.2}px)`,
+              translateY(${rotateX * 1.2}px)`,
             opacity: isHovered ? 0.95 : 0.45,
-            filter: isHovered ? "blur(18px)" : "blur(12px)",
+            filter: isHovered
+              ? "blur(18px)"
+              : "blur(12px)",
           }}
         />
       </motion.div>
@@ -286,6 +355,7 @@ const DigitalArtCard3D = ({
   );
 };
 
+// Main digital art gallery
 const DigitalArt = () => {
   const navigate = useNavigate();
 
@@ -293,42 +363,89 @@ const DigitalArt = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [deletingId, setDeletingId] = useState(null);
+  const [retryCount, setRetryCount] = useState(0);
 
-  // FETCH DIGITAL ARTWORKS
-  useEffect(() => {
-    fetch("https://harsh-arts-backend-2.onrender.com/api/getDigitalArt")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to fetch digital artworks");
-        }
-
-        return response.json();
-      })
-      .then((data) => {
-        setArts(data);
-      })
-      .catch((err) => {
-        console.error("Error fetching digital artworks:", err);
-        setError("Unable to load digital artworks from server , server not running.");
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, []);
-
-  // AUTHORIZATION CHECK
+  // Authorization check.
   const username = sessionStorage.getItem("username");
   const password = sessionStorage.getItem("password");
 
   const isAuthorized =
     username === "harsh" && password === "harsh123";
 
-  // DELETE DIGITAL ARTWORK
+  // Fetch all digital artworks.
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const fetchArts = async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        const response = await fetch(
+          `${API_BASE_URL}/api/getDigitalArt`,
+          {
+            method: "GET",
+            headers: {
+              Accept: "application/json",
+            },
+            signal: controller.signal,
+          }
+        );
+
+        if (response.status === 503) {
+          throw new Error(
+            "The server is waking up. Please wait and try again."
+          );
+        }
+
+        if (!response.ok) {
+          throw new Error(
+            `Failed to fetch digital artworks (${response.status})`
+          );
+        }
+
+        const data = await response.json();
+
+        if (!Array.isArray(data)) {
+          throw new Error(
+            "The API did not return a list of paintings."
+          );
+        }
+
+        setArts(data);
+      } catch (err) {
+        if (err.name !== "AbortError") {
+          console.error("Fetch digital artworks error:", err);
+
+          setError(
+            err.message || "Unable to load digital artworks."
+          );
+        }
+      } finally {
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchArts();
+
+    return () => controller.abort();
+  }, [retryCount]);
+
+  // Delete digital artwork.
   const handleDelete = async (id) => {
     if (!isAuthorized) {
       alert("You are not authorized to delete artworks.");
       return;
     }
+
+    if (id === undefined || id === null || id === "") {
+      alert("Digital artwork ID is missing.");
+      return;
+    }
+
+    if (deletingId !== null) return;
 
     const confirmed = window.confirm(
       "Are you sure you want to delete this digital artwork?"
@@ -341,7 +458,9 @@ const DigitalArt = () => {
 
     try {
       const response = await fetch(
-        `https://harsh-arts-backend-2.onrender.com/api/deleteDigitalArt/${encodeURIComponent(id)}`,
+        `${API_BASE_URL}/api/deleteDigitalArt/${encodeURIComponent(
+          id
+        )}`,
         {
           method: "DELETE",
         }
@@ -354,31 +473,39 @@ const DigitalArt = () => {
           );
         }
 
-        throw new Error("Failed to delete digital artwork.");
+        throw new Error(
+          `Failed to delete digital artwork (${response.status})`
+        );
       }
 
-      // REMOVE DELETED ARTWORK FROM THE GALLERY
+      // Remove deleted artwork from the UI.
       setArts((previousArts) =>
-        previousArts.filter((art) => art.id !== id)
+        previousArts.filter(
+          (art) =>
+            String(art.id ?? art._id) !== String(id)
+        )
       );
     } catch (err) {
-      console.error("Delete error:", err);
-      setError(err.message || "Unable to delete digital artwork.");
+      console.error("Delete digital artwork error:", err);
+
+      setError(
+        err.message || "Unable to delete digital artwork."
+      );
     } finally {
       setDeletingId(null);
     }
   };
 
-  // TRIM DESCRIPTION
+  // Trim long titles and descriptions.
   const trimWords = (text = "", wordLimit = 15) => {
-    const words = text.split(/\s+/);
+    const words = String(text).split(/\s+/);
 
     return words.length > wordLimit
       ? words.slice(0, wordLimit).join(" ") + "..."
       : text;
   };
 
-  // LOADING
+  // Loading screen.
   if (loading) {
     return (
       <div className="background gallery-3d-root">
@@ -387,12 +514,16 @@ const DigitalArt = () => {
     );
   }
 
-  // INITIAL FETCH ERROR
+  // Error screen.
   if (error && arts.length === 0) {
     return (
       <div className="background gallery-3d-root">
         <h2>{error}</h2>
-        <button onClick={() => window.location.reload()}>
+
+        <button
+          type="button"
+          onClick={() => setRetryCount((count) => count + 1)}
+        >
           Try Again
         </button>
       </div>
@@ -403,7 +534,7 @@ const DigitalArt = () => {
     <div className="background gallery-3d-root">
       <div className="gallery-spotlight-beam" />
 
-      {/* HERO SECTION */}
+      {/* Hero section */}
       <motion.div
         className="hero-content gallery-hero-3d"
         initial="hidden"
@@ -429,7 +560,9 @@ const DigitalArt = () => {
           }}
         >
           <span className="gallery-badge-dot" />
-          <span>Curated Exhibition • Digital Art</span>
+          <span>
+            Curated Exhibition • Digital Art
+          </span>
         </motion.div>
 
         <motion.h1
@@ -461,19 +594,20 @@ const DigitalArt = () => {
           imagination through vibrant digital masterpieces.
         </motion.p>
 
-        {/* ADD ARTS BUTTON */}
-        <motion.div
-          variants={{
-            hidden: { y: 20, opacity: 0 },
-            visible: { y: 0, opacity: 1 },
-          }}
-          transition={{
-            duration: 0.9,
-            ease: "easeOut",
-          }}
-        >
-          {isAuthorized && (
+        {/* Add artworks button */}
+        {isAuthorized && (
+          <motion.div
+            variants={{
+              hidden: { y: 20, opacity: 0 },
+              visible: { y: 0, opacity: 1 },
+            }}
+            transition={{
+              duration: 0.9,
+              ease: "easeOut",
+            }}
+          >
             <motion.button
+              type="button"
               className="add-arts-btn"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -483,11 +617,11 @@ const DigitalArt = () => {
             >
               Add Arts
             </motion.button>
-          )}
-        </motion.div>
+          </motion.div>
+        )}
       </motion.div>
 
-      {/* ERROR MESSAGE */}
+      {/* Error message when artworks have already loaded */}
       {error && (
         <p
           role="alert"
@@ -501,7 +635,7 @@ const DigitalArt = () => {
         </p>
       )}
 
-      {/* ART GRID */}
+      {/* Artwork grid */}
       <motion.div
         className="gallery-container top gallery-grid-3d"
         initial="hidden"
@@ -520,9 +654,8 @@ const DigitalArt = () => {
         ) : (
           arts.map((painting, index) => (
             <DigitalArtCard3D
-              key={painting.id || index}
+              key={painting.id ?? painting._id ?? index}
               painting={painting}
-              index={index}
               navigate={navigate}
               trimWords={trimWords}
               isAuthorized={isAuthorized}
