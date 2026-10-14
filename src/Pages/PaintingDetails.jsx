@@ -1,98 +1,79 @@
- 
-
 import React, { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-
 import "./ArtGallery.css";
 
 const API_BASE_URL = (
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:8080"
+  import.meta.env.VITE_API_BASE_URL ||
+  "https://harsh-arts-backend-2.onrender.com"
 ).replace(/\/+$/, "");
 
-/* Map URL apiType to your Spring Boot endpoint */
+/* ✅ Map apiType to Spring Boot endpoint */
 const getPaintingEndpoint = (apiType, id) => {
   const type = (apiType || "").toLowerCase().trim();
 
-  let endpoint;
+  if (type === "home" || type === "artgallery") return null;
 
-  if (type === "home" || type === "artgallery") {
-    // Add a home painting endpoint if these are stored in MongoDB.
-    return null;
-  } else if (type.includes("charcoal")) {
-    endpoint = "getCharcoalById";
-  } else if (
-    type.includes("pencil") ||
-    type.includes("colour") ||
-    type.includes("color")
-  ) {
-    endpoint = "getColouredPencilById";
-  } else if (type === "pen" || type.includes("pen")) {
-    endpoint = "getPenSketchById";
-  } else if (type.includes("digital")) {
-    endpoint = "getDigitalArtById";
-  } else if (type.includes("water")) {
-    endpoint = "getWatercolorById";
-  } else if (type.includes("mixed")) {
-    endpoint = "getMixedMediaById";
-  } else {
-    return null;
-  }
+  let endpoint;
+  if (type.includes("charcoal"))                                    endpoint = "getCharcoalById";
+  else if (type.includes("pencil") || type.includes("colour") || type.includes("color")) endpoint = "getColouredPencilById";
+  else if (type === "pen" || (type.includes("pen") && !type.includes("pencil")))          endpoint = "getPenSketchById";
+  else if (type.includes("digital"))                                endpoint = "getDigitalArtById";
+  else if (type.includes("water"))                                  endpoint = "getWatercolorById";
+  else if (type.includes("mixed"))                                  endpoint = "getMixedMediaById";
+  else return null;
 
   return `/api/${endpoint}/${encodeURIComponent(id)}`;
 };
 
-/* Get readable medium name */
+/* ✅ Medium label */
 const getMediumName = (apiType) => {
   const type = (apiType || "").toLowerCase();
-
-  if (type.includes("charcoal")) return "Charcoal & Graphite Artwork";
-  if (type.includes("digital")) return "Digital Fine Art";
-  if (type.includes("water")) return "Watercolor Painting";
-
-  if (
-    type.includes("pencil") ||
-    type.includes("colour") ||
-    type.includes("color")
-  ) {
-    return "Colored Pencil Art";
-  }
-
-  if (type === "pen" || type.includes("pen")) {
-    return "Ball Pen Sketch";
-  }
-
-  if (type.includes("mixed")) return "Mixed Media Artwork";
-
+  if (type.includes("charcoal"))                                                          return "Charcoal & Graphite Artwork";
+  if (type.includes("digital"))                                                           return "Digital Fine Art";
+  if (type.includes("water"))                                                             return "Watercolor Painting";
+  if (type.includes("pencil") || type.includes("colour") || type.includes("color"))      return "Colored Pencil Art";
+  if (type === "pen" || (type.includes("pen") && !type.includes("pencil")))              return "Ball Pen Sketch";
+  if (type.includes("mixed"))                                                             return "Mixed Media Artwork";
   return "Original Exhibition Piece";
 };
 
+/* ✅ Base64 / URL image converter */
+const getImageSrc = (raw) => {
+  if (!raw) return "";
+  if (typeof raw === "string" && raw.startsWith("http"))  return raw;
+  if (typeof raw === "string" && raw.startsWith("data:")) return raw;
+  if (typeof raw === "string") {
+    if (raw.startsWith("/9j/"))    return `data:image/jpeg;base64,${raw}`;
+    if (raw.startsWith("iVBOR"))  return `data:image/png;base64,${raw}`;
+    if (raw.startsWith("R0lGOD")) return `data:image/gif;base64,${raw}`;
+    if (raw.startsWith("UklGR"))  return `data:image/webp;base64,${raw}`;
+    return `data:image/jpeg;base64,${raw}`;
+  }
+  if (typeof raw === "object" && raw !== null) {
+    return raw.default || raw.src || raw.url || "";
+  }
+  return "";
+};
+
 const PaintingDetails = () => {
-  // Dynamic parameters from React Router
   const { apiType, id } = useParams();
   const navigate = useNavigate();
 
-  // Painting API states
-  const [painting, setPainting] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [painting, setPainting]   = useState(null);
+  const [loading, setLoading]     = useState(true);
+  const [error, setError]         = useState("");
+  const [retryCount, setRetryCount] = useState(0);
 
-  // Existing 3D interaction states
   const frameRef = useRef(null);
-  const [rotateX, setRotateX] = useState(0);
-  const [rotateY, setRotateY] = useState(0);
-  const [glarePos, setGlarePos] = useState({
-    x: 50,
-    y: 50,
-    opacity: 0,
-  });
+  const [rotateX, setRotateX]     = useState(0);
+  const [rotateY, setRotateY]     = useState(0);
+  const [glarePos, setGlarePos]   = useState({ x: 50, y: 50, opacity: 0 });
   const [isHovered, setIsHovered] = useState(false);
-  const [isZoomed, setIsZoomed] = useState(false);
+  const [isZoomed, setIsZoomed]   = useState(false);
   const [autoOrbit, setAutoOrbit] = useState(false);
 
-  /*
-   * Fetch the painting whenever apiType or id changes.
-   */
+  /* ✅ Fetch painting */
   useEffect(() => {
     const controller = new AbortController();
 
@@ -108,56 +89,53 @@ const PaintingDetails = () => {
       }
 
       const endpoint = getPaintingEndpoint(apiType, id);
-
       if (!endpoint) {
-        setError(
-          `No REST API configured for painting category "${apiType}".`
-        );
+        setError(`No API configured for category "${apiType}".`);
         setLoading(false);
         return;
       }
 
+      const fullUrl = `${API_BASE_URL}${endpoint}`;
+      console.log("🔗 Fetching:", fullUrl);
+
       try {
-        const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+        const response = await fetch(fullUrl, {
           method: "GET",
-          headers: {
-            Accept: "application/json",
-          },
+          headers: { Accept: "application/json" },
           signal: controller.signal,
         });
 
-        if (!response.ok) {
-          if (response.status === 404) {
-            throw new Error("Painting not found.");
-          }
+        console.log("📡 Response status:", response.status);
 
-          throw new Error(
-            `Failed to load painting. HTTP ${response.status}`
-          );
+        if (response.status === 503) {
+          throw new Error("Server is starting up, please wait 30 seconds and retry!");
+        }
+        if (response.status === 404) {
+          throw new Error("Painting not found.");
+        }
+        if (!response.ok) {
+          throw new Error(`Server error. HTTP ${response.status}`);
         }
 
         const data = await response.json();
-
-        // ByIdController returns the entity directly.
+        console.log("✅ API Data:", data);
         setPainting(data);
+
       } catch (err) {
         if (err.name !== "AbortError") {
-          console.error("Painting API error:", err);
+          console.error("❌ API Error:", err.message);
           setError(err.message || "Unable to load painting details.");
         }
       } finally {
-        if (!controller.signal.aborted) {
-          setLoading(false);
-        }
+        if (!controller.signal.aborted) setLoading(false);
       }
     };
 
     fetchPainting();
-
     return () => controller.abort();
-  }, [apiType, id]);
+  }, [apiType, id, retryCount]);
 
-  // Reset the interactive view when the URL changes
+  /* Reset 3D view on route change */
   useEffect(() => {
     setIsZoomed(false);
     setAutoOrbit(false);
@@ -167,42 +145,32 @@ const PaintingDetails = () => {
     setGlarePos({ x: 50, y: 50, opacity: 0 });
   }, [apiType, id]);
 
-  /* Support common image field names from MongoDB */
+  /* ✅ Get image source - handles base64 + URL */
   const rawImage =
     painting?.img ??
     painting?.imageUrl ??
     painting?.image ??
-    painting?.imagePath;
+    painting?.imagePath ??
+    painting?.imageData ??
+    painting?.base64Image ??
+    painting?.photo;
 
-  const imageSource =
-    typeof rawImage === "object" && rawImage !== null
-      ? rawImage.default || rawImage.src || rawImage.url || ""
-      : rawImage || "";
+  const imageSource = getImageSrc(rawImage);
 
-  /* 3D mouse movement */
+  /* 3D mouse handlers */
   const handleMouseMove = (e) => {
     if (!frameRef.current || autoOrbit) return;
-
     const rect = frameRef.current.getBoundingClientRect();
-
     if (!rect.width || !rect.height) return;
-
     const xPercent = (e.clientX - rect.left) / rect.width;
     const yPercent = (e.clientY - rect.top) / rect.height;
-
     setRotateX((0.5 - yPercent) * 26);
     setRotateY((xPercent - 0.5) * 26);
-
-    setGlarePos({
-      x: xPercent * 100,
-      y: yPercent * 100,
-      opacity: 0.42,
-    });
+    setGlarePos({ x: xPercent * 100, y: yPercent * 100, opacity: 0.42 });
   };
 
   const handleMouseLeave = () => {
     setIsHovered(false);
-
     if (!autoOrbit) {
       setRotateX(0);
       setRotateY(0);
@@ -219,27 +187,44 @@ const PaintingDetails = () => {
 
   const mediumLabel = getMediumName(apiType);
 
-  /* Loading screen */
+  /* ✅ Loading screen */
   if (loading) {
     return (
       <div className="painting-not-found-3d">
-        <p>Loading painting details...</p>
+        <p>⏳ Loading artwork details...</p>
+        <p style={{ fontSize: "0.8em", color: "#888", marginTop: "8px" }}>
+          Server may be starting up, please wait...
+        </p>
       </div>
     );
   }
 
-  /* Error screen */
+  /* ✅ Error screen with retry */
   if (error || !painting) {
     return (
       <div className="painting-not-found-3d">
-        <p>{error || "Painting not found."}</p>
-        <button
-          type="button"
-          onClick={() => navigate(-1)}
-          className="btn-back-3d"
-        >
-          &larr; Back to Gallery
-        </button>
+        <p>❌ {error || "Painting not found."}</p>
+        {error?.includes("starting") || error?.includes("503") ? (
+          <p style={{ color: "#888", fontSize: "0.85em", margin: "8px 0" }}>
+            🔄 Free server is waking up — wait 30 sec and retry!
+          </p>
+        ) : null}
+        <div style={{ display: "flex", gap: "10px", marginTop: "16px" }}>
+          <button
+            type="button"
+            className="btn-back-3d"
+            onClick={() => setRetryCount((c) => c + 1)}
+          >
+            🔄 Retry
+          </button>
+          <button
+            type="button"
+            className="btn-back-3d"
+            onClick={() => navigate(-1)}
+          >
+            &larr; Back to Gallery
+          </button>
+        </div>
       </div>
     );
   }
@@ -255,18 +240,14 @@ const PaintingDetails = () => {
           <div className="stage-3d-column">
             <div
               ref={frameRef}
-              className={`artwork-3d-viewport ${
-                isZoomed ? "zoomed" : ""
-              }`}
+              className={`artwork-3d-viewport ${isZoomed ? "zoomed" : ""}`}
               onMouseMove={handleMouseMove}
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={handleMouseLeave}
               style={{ perspective: "1200px" }}
             >
               <motion.div
-                className={`artwork-3d-rig ${
-                  autoOrbit ? "auto-orbiting" : ""
-                }`}
+                className={`artwork-3d-rig ${autoOrbit ? "auto-orbiting" : ""}`}
                 animate={{
                   rotateX: autoOrbit ? [12, -12, 12] : rotateX,
                   rotateY: autoOrbit ? [-18, 18, -18] : rotateY,
@@ -274,22 +255,10 @@ const PaintingDetails = () => {
                 }}
                 transition={
                   autoOrbit
-                    ? {
-                        duration: 6,
-                        repeat: Infinity,
-                        ease: "easeInOut",
-                      }
-                    : {
-                        type: "spring",
-                        stiffness: 280,
-                        damping: 24,
-                      }
+                    ? { duration: 6, repeat: Infinity, ease: "easeInOut" }
+                    : { type: "spring", stiffness: 280, damping: 24 }
                 }
-                style={{
-                  transformStyle: "preserve-3d",
-                  width: "100%",
-                  height: "100%",
-                }}
+                style={{ transformStyle: "preserve-3d", width: "100%", height: "100%" }}
               >
                 <div className="frame-3d-exterior">
                   <div className="frame-gold-fillet" />
@@ -306,13 +275,11 @@ const PaintingDetails = () => {
                       alignItems: "center",
                       justifyContent: "center",
                       background: "#0d0f17",
-                      transform: isHovered
-                        ? "translateZ(35px)"
-                        : "translateZ(0px)",
-                      transition:
-                        "transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)",
+                      transform: isHovered ? "translateZ(35px)" : "translateZ(0px)",
+                      transition: "transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)",
                     }}
                   >
+                    {/* ✅ Fixed image */}
                     {imageSource ? (
                       <img
                         src={imageSource}
@@ -325,11 +292,13 @@ const PaintingDetails = () => {
                           borderRadius: "10px",
                           pointerEvents: "none",
                         }}
+                        onError={(e) => {
+                          console.error("❌ Image load failed");
+                          e.target.style.display = "none";
+                        }}
                       />
                     ) : (
-                      <p style={{ color: "#fff" }}>
-                        Artwork image unavailable
-                      </p>
+                      <p style={{ color: "#fff" }}>Artwork image unavailable</p>
                     )}
 
                     <div
@@ -338,11 +307,7 @@ const PaintingDetails = () => {
                         position: "absolute",
                         inset: 0,
                         pointerEvents: "none",
-                        background: `radial-gradient(
-                          circle at ${glarePos.x}% ${glarePos.y}%,
-                          rgba(255, 235, 190, 0.45) 0%,
-                          transparent 65%
-                        )`,
+                        background: `radial-gradient(circle at ${glarePos.x}% ${glarePos.y}%, rgba(255, 235, 190, 0.45) 0%, transparent 65%)`,
                         opacity: glarePos.opacity,
                         transform: "translateZ(40px)",
                         mixBlendMode: "screen",
@@ -353,9 +318,7 @@ const PaintingDetails = () => {
                   <div
                     className="floating-3d-badge"
                     style={{
-                      transform: isHovered
-                        ? "translateZ(65px)"
-                        : "translateZ(20px)",
+                      transform: isHovered ? "translateZ(65px)" : "translateZ(20px)",
                       transition: "transform 0.4s ease",
                     }}
                   >
@@ -368,61 +331,42 @@ const PaintingDetails = () => {
               </motion.div>
             </div>
 
-            {/* 3D controls */}
             <div className="stage-controls-bar">
               <button
                 type="button"
                 className={`tool-btn ${autoOrbit ? "active" : ""}`}
                 onClick={() => setAutoOrbit((prev) => !prev)}
-                title="Toggle 3D continuous auto-orbit"
               >
                 {autoOrbit ? "⏸ Stop Orbit" : "🔄 3D Orbit"}
               </button>
-
               <button
                 type="button"
                 className={`tool-btn ${isZoomed ? "active" : ""}`}
                 onClick={() => setIsZoomed((prev) => !prev)}
-                title="Toggle zoom inspection"
               >
                 {isZoomed ? "🔍 Zoom Out" : "🔍 Zoom In"}
               </button>
-
-              <button
-                type="button"
-                className="tool-btn"
-                onClick={reset3DView}
-                title="Reset 3D camera angle"
-              >
+              <button type="button" className="tool-btn" onClick={reset3DView}>
                 ⟲ Reset Angle
               </button>
             </div>
 
             <div className="stage-hint">
-              <span>
-                ✦ Hover and tilt mouse to inspect canvas in 3D space
-              </span>
+              <span>✦ Hover and tilt mouse to inspect canvas in 3D space</span>
             </div>
           </div>
 
-          {/* 2. PAINTING DETAILS FROM REST API */}
+          {/* 2. PAINTING DETAILS */}
           <div className="details-info-column">
             <motion.div
               className="info-3d-glass-card"
               initial={{ opacity: 0, x: 40 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{
-                duration: 0.85,
-                ease: [0.22, 1, 0.36, 1],
-              }}
+              transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
             >
               <div className="info-top-header">
-                <span className="provenance-tag">
-                  Exhibition Piece
-                </span>
-                <span className="provenance-year">
-                  The Haat of Art 2026
-                </span>
+                <span className="provenance-tag">Exhibition Piece</span>
+                <span className="provenance-year">The Haat of Art 2026</span>
               </div>
 
               <h1 className="title-art-3d">
@@ -430,9 +374,7 @@ const PaintingDetails = () => {
               </h1>
 
               {painting.description && (
-                <p className="description-art-3d">
-                  {painting.description}
-                </p>
+                <p className="description-art-3d">{painting.description}</p>
               )}
 
               <div className="artwork-meta-box">
@@ -440,21 +382,16 @@ const PaintingDetails = () => {
                   <span className="meta-label">Medium</span>
                   <span className="meta-value">{mediumLabel}</span>
                 </div>
-
                 <div className="meta-item">
                   <span className="meta-label">Exhibition</span>
-                  <span className="meta-value">
-                    The Haat of Art • 2026
-                  </span>
+                  <span className="meta-value">The Haat of Art • 2026</span>
                 </div>
-
                 <div className="meta-item">
                   <span className="meta-label">Availability</span>
                   <span className="meta-value status-available">
                     {painting.availability || "Original Available"}
                   </span>
                 </div>
-
                 <div className="meta-item">
                   <span className="meta-label">Authenticity</span>
                   <span className="meta-value">
@@ -473,7 +410,6 @@ const PaintingDetails = () => {
                 >
                   &larr; Back to Gallery
                 </motion.button>
-
                 <Link to="/Lets-connect" className="btn-inquire-3d">
                   <span>Inquire About Artwork &rarr;</span>
                 </Link>
@@ -508,7 +444,6 @@ const PaintingDetails = () => {
               >
                 &times;
               </button>
-
               {imageSource && (
                 <img
                   src={imageSource}
@@ -516,7 +451,6 @@ const PaintingDetails = () => {
                   className="zoom-modal-img"
                 />
               )}
-
               <div className="zoom-modal-caption">
                 <h3>{painting.title || "Untitled Artwork"}</h3>
                 <p>{mediumLabel}</p>
