@@ -3,9 +3,14 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import "./Gallery3D.css";
 
+const API_BASE_URL = (
+  import.meta.env.VITE_API_BASE_URL ||
+  "https://harsh-arts-backend-2.onrender.com"
+).replace(/\/+$/, "");
+
+// Individual coloured pencil artwork card
 const ColouredPencilCard3D = ({
   painting,
-  index,
   navigate,
   trimWords,
   isAuthorized,
@@ -25,14 +30,90 @@ const ColouredPencilCard3D = ({
 
   const [isHovered, setIsHovered] = useState(false);
 
-  const imageSource = painting.image
-    ? `data:image/jpeg;base64,${painting.image}`
-    : "/placeholder.jpg";
+  // Support both MongoDB-style IDs and ordinary IDs.
+  const paintingId = painting.id ?? painting._id;
+
+  // Support Base64 images and image URLs.
+  const getImageSource = () => {
+    const rawImage =
+      painting.image ??
+      painting.img ??
+      painting.imageUrl ??
+      painting.imagePath ??
+      painting.imageData ??
+      painting.base64Image ??
+      painting.photo;
+
+    if (!rawImage) return "/placeholder.jpg";
+
+    if (typeof rawImage === "object") {
+      return (
+        rawImage.url ||
+        rawImage.src ||
+        rawImage.default ||
+        "/placeholder.jpg"
+      );
+    }
+
+    if (typeof rawImage !== "string") {
+      return "/placeholder.jpg";
+    }
+
+    if (
+      rawImage.startsWith("http://") ||
+      rawImage.startsWith("https://") ||
+      rawImage.startsWith("data:")
+    ) {
+      return rawImage;
+    }
+
+    // Detect common Base64 image formats.
+    if (rawImage.startsWith("/9j/")) {
+      return `data:image/jpeg;base64,${rawImage}`;
+    }
+
+    if (rawImage.startsWith("iVBOR")) {
+      return `data:image/png;base64,${rawImage}`;
+    }
+
+    if (rawImage.startsWith("R0lGOD")) {
+      return `data:image/gif;base64,${rawImage}`;
+    }
+
+    if (rawImage.startsWith("UklGR")) {
+      return `data:image/webp;base64,${rawImage}`;
+    }
+
+    return `data:image/jpeg;base64,${rawImage}`;
+  };
+
+  const imageSource = getImageSource();
+
+  // Navigate to the artwork details page.
+  const openDetails = () => {
+    if (
+      paintingId === undefined ||
+      paintingId === null ||
+      paintingId === ""
+    ) {
+      console.error("Painting ID is missing:", painting);
+      alert("Painting ID is missing.");
+      return;
+    }
+
+    navigate(
+      `/paintingDetails/getColouredPencilById/${encodeURIComponent(
+        paintingId
+      )}`
+    );
+  };
 
   const handleMouseMove = (e) => {
     if (!cardRef.current) return;
 
     const rect = cardRef.current.getBoundingClientRect();
+
+    if (!rect.width || !rect.height) return;
 
     const xPercent = (e.clientX - rect.left) / rect.width;
     const yPercent = (e.clientY - rect.top) / rect.height;
@@ -58,24 +139,13 @@ const ColouredPencilCard3D = ({
     }));
   };
 
-  const handleDeleteClick = (e) => {
-    e.stopPropagation();
-    onDelete(painting.id);
-  };
-
   return (
     <motion.div
       ref={cardRef}
       className="art-card-3d-wrapper"
       variants={{
-        hidden: {
-          y: 50,
-          opacity: 0,
-        },
-        visible: {
-          y: 0,
-          opacity: 1,
-        },
+        hidden: { y: 50, opacity: 0 },
+        visible: { y: 0, opacity: 1 },
       }}
       transition={{
         duration: 0.6,
@@ -84,11 +154,7 @@ const ColouredPencilCard3D = ({
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={handleMouseLeave}
-      onClick={() =>
-        navigate(
-          `/painting/ColouredPencilImport/${painting.id}`
-        )
-      }
+      onClick={openDetails}
       style={{
         perspective: "1000px",
         cursor: "pointer",
@@ -115,7 +181,7 @@ const ColouredPencilCard3D = ({
         <div className="art-card-frame">
           <div className="art-frame-bevel" />
 
-          {/* IMAGE */}
+          {/* Artwork image */}
           <div
             className="art-canvas-container"
             style={{
@@ -130,9 +196,14 @@ const ColouredPencilCard3D = ({
               src={imageSource}
               alt={painting.title || "Coloured pencil artwork"}
               className="art-canvas-image"
+              onError={(e) => {
+                if (!e.currentTarget.src.endsWith("/placeholder.jpg")) {
+                  e.currentTarget.src = "/placeholder.jpg";
+                }
+              }}
             />
 
-            {/* GLARE EFFECT */}
+            {/* Glare effect */}
             <div
               className="art-canvas-glare"
               style={{
@@ -146,7 +217,7 @@ const ColouredPencilCard3D = ({
               }}
             />
 
-            {/* CATEGORY BADGE */}
+            {/* Category badge */}
             <div
               className="art-card-floating-badge"
               style={{
@@ -160,7 +231,7 @@ const ColouredPencilCard3D = ({
               <span>Coloured Pencil</span>
             </div>
 
-            {/* VIEW DETAILS OVERLAY */}
+            {/* View details overlay */}
             <div
               className="art-image-overlay"
               style={{
@@ -176,8 +247,7 @@ const ColouredPencilCard3D = ({
                   transform: isHovered
                     ? "translateZ(60px)"
                     : "translateZ(20px)",
-                  transition:
-                    "transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)",
+                  transition: "transform 0.4s ease",
                 }}
               >
                 View Details
@@ -185,25 +255,25 @@ const ColouredPencilCard3D = ({
             </div>
           </div>
 
-          {/* CARD CONTENT */}
+          {/* Card content */}
           <div
             className="art-card-content"
             style={{
               transform: isHovered
                 ? "translateZ(24px)"
                 : "translateZ(0px)",
-              transition:
-                "transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1)",
+              transition: "transform 0.4s ease",
             }}
           >
             <motion.h1
               className="card-title"
-              whileHover={{
-                color: "#d4af37",
-              }}
+              whileHover={{ color: "#d4af37" }}
             >
-              {painting.title ||
-                "Untitled Coloured Pencil Artwork"}
+              {trimWords(
+                painting.title ||
+                  "Untitled Coloured Pencil Artwork",
+                50
+              )}
             </motion.h1>
 
             <p className="card-description">
@@ -216,69 +286,66 @@ const ColouredPencilCard3D = ({
 
             <div className="card-footer">
               <span className="artist-name" />
-
               <span className="card-curation">
                 Original Piece
               </span>
             </div>
 
-            {/* SMALL DELETE BUTTON - BOTTOM RIGHT */}
+            {/* Delete button */}
             {isAuthorized && (
               <div
-                         style={{
-                           display: "flex",
-                           justifyContent: "flex-end",
-                           alignItems: "center",
-                           marginTop: "15px",
-                           paddingBottom: "5px",
-                         }}
-                       >
-                         <motion.button
-                           type="button"
-                           className="delete-art-btn"
-                           whileHover={{
-                             scale: 1.05,
-                             backgroundColor: "#b91c1c",
-                           }}
-                           whileTap={{
-                             scale: 0.95,
-                           }}
-                           disabled={
-                             String(deletingId) === String(painting.id)
-                           }
-                           onClick={(e) => {
-                             e.stopPropagation();
-                             onDelete(painting.id);
-                           }}
-                           style={{
-                             padding: "9px 18px",
-                             border: "none",
-                             borderRadius: "8px",
-                             backgroundColor: "#dc2626",
-                             color: "#ffffff",
-                             fontWeight: 600,
-                             cursor: "pointer",
-                             opacity:
-                               String(deletingId) === String(painting.id)
-                                 ? 0.6
-                                 : 1,
-                           }}
-                         >
-                           {String(deletingId) === String(painting.id)
-                             ? "Deleting..."
-                             : "Delete"}
-                         </motion.button>
-                       </div>
+                style={{
+                  display: "flex",
+                  justifyContent: "flex-end",
+                  alignItems: "center",
+                  marginTop: "15px",
+                  paddingBottom: "5px",
+                }}
+              >
+                <motion.button
+                  type="button"
+                  className="delete-art-btn"
+                  whileHover={{
+                    scale: 1.05,
+                    backgroundColor: "#b91c1c",
+                  }}
+                  whileTap={{ scale: 0.95 }}
+                  disabled={
+                    String(deletingId) === String(paintingId)
+                  }
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete(paintingId);
+                  }}
+                  style={{
+                    padding: "9px 18px",
+                    border: "none",
+                    borderRadius: "8px",
+                    backgroundColor: "#dc2626",
+                    color: "#ffffff",
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    opacity:
+                      String(deletingId) === String(paintingId)
+                        ? 0.6
+                        : 1,
+                  }}
+                >
+                  {String(deletingId) === String(paintingId)
+                    ? "Deleting..."
+                    : "Delete"}
+                </motion.button>
+              </div>
             )}
           </div>
         </div>
 
-        {/* FLOOR SHADOW */}
+        {/* Floor shadow */}
         <div
           className="art-card-floor-shadow"
           style={{
             transform: `translateX(${-rotateY * 1.5}px)
-                        translateY(${rotateX * 1.2}px)`,
+              translateY(${rotateX * 1.2}px)`,
             opacity: isHovered ? 0.95 : 0.45,
             filter: isHovered
               ? "blur(18px)"
@@ -290,6 +357,7 @@ const ColouredPencilCard3D = ({
   );
 };
 
+// Main coloured pencil gallery
 const ColouredPencil = () => {
   const navigate = useNavigate();
 
@@ -297,53 +365,90 @@ const ColouredPencil = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [deletingId, setDeletingId] = useState(null);
+  const [retryCount, setRetryCount] = useState(0);
 
-  // FETCH COLOURED PENCIL ARTWORKS
-  const fetchArts = () => {
-    return fetch(
-      "https://harsh-arts-backend-2.onrender.com/api/getColouredPencil"
-    )
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(
-            "Failed to fetch coloured pencil artworks"
-          );
-        }
-
-        return response.json();
-      })
-      .then((data) => {
-        setArts(data);
-        setError("");
-      });
-  };
-
-  useEffect(() => {
-    fetchArts()
-      .catch((err) => {
-        console.error("Fetch error:", err);
-        setError(
-          "Unable to load coloured pencil artworks from server , server not running."
-        );
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, []);
-
-  // AUTHORIZATION CHECK
+  // Authorization check.
   const username = sessionStorage.getItem("username");
   const password = sessionStorage.getItem("password");
 
   const isAuthorized =
     username === "harsh" && password === "harsh123";
 
-  // DELETE ARTWORK
+  // Fetch all coloured pencil artworks.
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const fetchArts = async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        const response = await fetch(
+          `${API_BASE_URL}/api/getColouredPencil`,
+          {
+            method: "GET",
+            headers: {
+              Accept: "application/json",
+            },
+            signal: controller.signal,
+          }
+        );
+
+        if (response.status === 503) {
+          throw new Error(
+            "The server is waking up. Please wait and try again."
+          );
+        }
+
+        if (!response.ok) {
+          throw new Error(
+            `Failed to fetch coloured pencil artworks (${response.status})`
+          );
+        }
+
+        const data = await response.json();
+
+        if (!Array.isArray(data)) {
+          throw new Error(
+            "The API did not return a list of paintings."
+          );
+        }
+
+        setArts(data);
+      } catch (err) {
+        if (err.name !== "AbortError") {
+          console.error("Fetch coloured pencil error:", err);
+
+          setError(
+            err.message ||
+              "Unable to load coloured pencil artworks."
+          );
+        }
+      } finally {
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchArts();
+
+    return () => controller.abort();
+  }, [retryCount]);
+
+  // Delete coloured pencil artwork.
   const handleDelete = async (id) => {
     if (!isAuthorized) {
       alert("You are not authorized to delete artworks.");
       return;
     }
+
+    if (id === undefined || id === null || id === "") {
+      alert("Artwork ID is missing.");
+      return;
+    }
+
+    if (deletingId !== null) return;
 
     const confirmed = window.confirm(
       "Are you sure you want to delete this coloured pencil artwork?"
@@ -356,7 +461,9 @@ const ColouredPencil = () => {
 
     try {
       const response = await fetch(
-        `https://harsh-arts-backend-2.onrender.com/api/deleteColouredPencil/${encodeURIComponent(id)}`,
+        `${API_BASE_URL}/api/deleteColouredPencil/${encodeURIComponent(
+          id
+        )}`,
         {
           method: "DELETE",
         }
@@ -369,15 +476,20 @@ const ColouredPencil = () => {
           );
         }
 
-        throw new Error("Failed to delete artwork.");
+        throw new Error(
+          `Failed to delete artwork (${response.status})`
+        );
       }
 
-      // Remove the deleted card from the UI
       setArts((previousArts) =>
-        previousArts.filter((art) => art.id !== id)
+        previousArts.filter(
+          (art) =>
+            String(art.id ?? art._id) !== String(id)
+        )
       );
     } catch (err) {
-      console.error("Delete error:", err);
+      console.error("Delete coloured pencil error:", err);
+
       setError(
         err.message || "Unable to delete artwork."
       );
@@ -386,16 +498,16 @@ const ColouredPencil = () => {
     }
   };
 
-  // TRIM DESCRIPTION
+  // Trim long descriptions and titles.
   const trimWords = (text = "", wordLimit = 15) => {
-    const words = text.split(/\s+/);
+    const words = String(text).split(/\s+/);
 
     return words.length > wordLimit
       ? words.slice(0, wordLimit).join(" ") + "..."
       : text;
   };
 
-  // LOADING
+  // Loading screen.
   if (loading) {
     return (
       <div className="background gallery-3d-root">
@@ -404,13 +516,16 @@ const ColouredPencil = () => {
     );
   }
 
-  // INITIAL FETCH ERROR
+  // Error screen.
   if (error && arts.length === 0) {
     return (
       <div className="background gallery-3d-root">
         <h2>{error}</h2>
 
-        <button onClick={() => window.location.reload()}>
+        <button
+          type="button"
+          onClick={() => setRetryCount((count) => count + 1)}
+        >
           Try Again
         </button>
       </div>
@@ -421,7 +536,7 @@ const ColouredPencil = () => {
     <div className="background gallery-3d-root">
       <div className="gallery-spotlight-beam" />
 
-      {/* HERO SECTION */}
+      {/* Hero section */}
       <motion.div
         className="hero-content gallery-hero-3d"
         initial="hidden"
@@ -447,7 +562,6 @@ const ColouredPencil = () => {
           }}
         >
           <span className="gallery-badge-dot" />
-
           <span>
             Curated Exhibition • Coloured Pencil
           </span>
@@ -482,19 +596,20 @@ const ColouredPencil = () => {
           details bring every coloured pencil creation to life.
         </motion.p>
 
-        {/* ADD ARTS BUTTON */}
-        <motion.div
-          variants={{
-            hidden: { y: 20, opacity: 0 },
-            visible: { y: 0, opacity: 1 },
-          }}
-          transition={{
-            duration: 0.9,
-            ease: "easeOut",
-          }}
-        >
-          {isAuthorized && (
+        {/* Add artworks button */}
+        {isAuthorized && (
+          <motion.div
+            variants={{
+              hidden: { y: 20, opacity: 0 },
+              visible: { y: 0, opacity: 1 },
+            }}
+            transition={{
+              duration: 0.9,
+              ease: "easeOut",
+            }}
+          >
             <motion.button
+              type="button"
               className="add-arts-btn"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -504,11 +619,11 @@ const ColouredPencil = () => {
             >
               Add Arts
             </motion.button>
-          )}
-        </motion.div>
+          </motion.div>
+        )}
       </motion.div>
 
-      {/* ERROR MESSAGE */}
+      {/* Error message when artworks have already loaded */}
       {error && (
         <p
           role="alert"
@@ -522,7 +637,7 @@ const ColouredPencil = () => {
         </p>
       )}
 
-      {/* ART GRID */}
+      {/* Artwork grid */}
       <motion.div
         className="gallery-container top gallery-grid-3d"
         initial="hidden"
@@ -541,9 +656,8 @@ const ColouredPencil = () => {
         ) : (
           arts.map((painting, index) => (
             <ColouredPencilCard3D
-              key={painting.id || index}
+              key={painting.id ?? painting._id ?? index}
               painting={painting}
-              index={index}
               navigate={navigate}
               trimWords={trimWords}
               isAuthorized={isAuthorized}
