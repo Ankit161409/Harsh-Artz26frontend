@@ -746,7 +746,7 @@ const WatercolorCard3D = ({
     }
 
     navigate(
-      `/paintingDetails/getColouredPencilById/${encodeURIComponent(
+      `/paintingDetails/getWaterColorById/${encodeURIComponent(
         paintingId
       )}`
     );
