@@ -6,7 +6,7 @@ import React from "react";
 
 //   </div> ); };
 
-const VideoLoader = () => { return ( <div className=" loader"> 
+const VideoLoader = () => { return ( <div className="loader"> 
  
   </div> ); };
 

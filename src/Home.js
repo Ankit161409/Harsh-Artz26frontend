@@ -11,7 +11,7 @@ export const homePaintings=[
   
   { title: "Maa kali", img: home1 },
   { title: "Mixed media", img: home2 },
-  // { title: "Mixed media", img: home3 },
+  
 
    
  
