@@ -641,9 +641,8 @@ import { useNavigate } from "react-router-dom";
 import "./Gallery3D.css";
 
 const API_BASE_URL = (
-  import.meta.env.VITE_API_BASE_URL ||
-  "https://harsh-arts-backend-2.onrender.com"
-).replace(/\/+$/, "");
+  
+  "https://harsh-arts-backend-2.onrender.com");
 
 /* ===================================================== */
 /* 3D WATERCOLOR ARTWORK CARD                            */
