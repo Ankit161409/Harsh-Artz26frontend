@@ -15,7 +15,7 @@ const getPaintingEndpoint = (apiType, id) => {
 
   let endpoint;
   if (type.includes("charcoal"))                                    endpoint = "getCharcoalById";
-  else if (type.includes("pencil") || type.includes("colour") || type.includes("color")) endpoint = "getColouredPencilById";
+  else if (type.includes("pencil") || type.includes("colour"))       endpoint = "getColouredPencilById";
   else if (type === "pen" || (type.includes("pen") && !type.includes("pencil")))          endpoint = "getPenSketchById";
   else if (type.includes("digital"))                                endpoint = "getDigitalArtById";
   else if (type.includes("water"))                                  endpoint = "getWatercolorById";
