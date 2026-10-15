@@ -21,7 +21,6 @@ export default function Login() {
 
   const cardRef = useRef(null);
   const buttonRef = useRef(null);
-  const buttonAreaRef = useRef(null);
   const timerRef = useRef(null);
   const intervalRef = useRef(null);
 
@@ -36,7 +35,7 @@ export default function Login() {
     };
   }, []);
 
-  // When form becomes valid, smoothly reset the button to center position
+  // When both ID & Password are typed, reset button back to center and keep it still
   useEffect(() => {
     if (isFormValid) {
       setBtnOffset({ x: 0, y: 0, rotate: 0 });
@@ -44,64 +43,60 @@ export default function Login() {
     }
   }, [isFormValid]);
 
-  // Handle button dodging animation (moves opposite to cursor)
-  const handleButtonDodge = (e) => {
+  // Handle runaway button hover: jumps to a new position away from cursor whenever hovered
+  const handleButtonHover = (e) => {
     if (isFormValid) return;
 
-    const btn = buttonRef.current;
-    if (!btn) return;
-
-    const rect = btn.getBoundingClientRect();
-    const cursorX = e.clientX;
-    const cursorY = e.clientY;
-
-    const btnCenterX = rect.left + rect.width / 2;
-    const btnCenterY = rect.top + rect.height / 2;
-
-    const diffX = cursorX - btnCenterX;
-    const diffY = cursorY - btnCenterY;
-
-    // Move in the OPPOSITE direction of the cursor:
-    // If cursor is on left (diffX < 0), push right (+95px).
-    // If cursor is on right (diffX >= 0), push left (-95px).
-    let targetX = diffX < 0 ? 95 : -95;
-    let targetY = diffY < 0 ? 38 : -38;
-
-    // Toggle if it's already near that offset so it keeps jumping and never gets trapped
     setBtnOffset((prev) => {
-      let newX = targetX;
-      let newY = targetY;
+      // Possible dodge destination offsets
+      const offsets = [
+        { x: -75, y: -25 },
+        { x: 75, y: -25 },
+        { x: -75, y: 25 },
+        { x: 75, y: 25 },
+        { x: -85, y: 0 },
+        { x: 85, y: 0 },
+        { x: 0, y: -30 },
+        { x: 0, y: 30 },
+      ];
 
-      if (Math.sign(prev.x) === Math.sign(targetX) && Math.abs(prev.x) > 30) {
-        newX = -targetX;
-      }
-      if (Math.sign(prev.y) === Math.sign(targetY) && Math.abs(prev.y) > 15) {
-        newY = -targetY;
+      // Keep only offsets noticeably different from the current position so it always jumps
+      const distantOffsets = offsets.filter(
+        (pos) => Math.abs(pos.x - prev.x) > 40 || Math.abs(pos.y - prev.y) > 20
+      );
+
+      // Prioritize opposite direction of the cursor if cursor coordinates are available
+      if (e && buttonRef.current) {
+        const rect = buttonRef.current.getBoundingClientRect();
+        const cursorX = e.clientX;
+        const cursorY = e.clientY;
+        const btnCenterX = rect.left + rect.width / 2;
+        const btnCenterY = rect.top + rect.height / 2;
+
+        const cursorOnRight = cursorX > btnCenterX;
+        const cursorOnBottom = cursorY > btnCenterY;
+
+        // If cursor is on right, prefer moving left (x < 0); if on bottom, prefer moving top (y < 0)
+        const oppositeOffsets = distantOffsets.filter(
+          (pos) =>
+            (cursorOnRight ? pos.x < 0 : pos.x > 0) ||
+            (cursorOnBottom ? pos.y < 0 : pos.y > 0)
+        );
+
+        if (oppositeOffsets.length > 0) {
+          const choice =
+            oppositeOffsets[Math.floor(Math.random() * oppositeOffsets.length)];
+          return { ...choice, rotate: (Math.random() - 0.5) * 14 };
+        }
       }
 
-      // Add a slight playful rotation tilt
-      const rot = (Math.random() - 0.5) * 16;
-      return { x: newX, y: newY, rotate: rot };
+      const fallback =
+        distantOffsets[Math.floor(Math.random() * distantOffsets.length)] ||
+        offsets[0];
+      return { ...fallback, rotate: (Math.random() - 0.5) * 14 };
     });
 
     setShowHint(true);
-  };
-
-  // Proximity dodge: if cursor moves within 75px radius of button center
-  const handleAreaMouseMove = (e) => {
-    if (isFormValid) return;
-    const btn = buttonRef.current;
-    if (!btn) return;
-
-    const rect = btn.getBoundingClientRect();
-    const dist = Math.hypot(
-      e.clientX - (rect.left + rect.width / 2),
-      e.clientY - (rect.top + rect.height / 2)
-    );
-
-    if (dist < 75) {
-      handleButtonDodge(e);
-    }
   };
 
   // Handle Back button click with 2-second delay
@@ -160,7 +155,7 @@ export default function Login() {
     e.preventDefault();
 
     if (!isFormValid) {
-      handleButtonDodge(e);
+      handleButtonHover(e);
       return;
     }
 
@@ -283,29 +278,33 @@ export default function Login() {
             </div>
 
             {/* Runaway Button Area */}
-            <div
-              ref={buttonAreaRef}
-              onMouseMove={handleAreaMouseMove}
-              style={styles.buttonArea}
-            >
+            <div style={styles.buttonArea}>
               <button
                 ref={buttonRef}
                 type="submit"
-                onMouseEnter={handleButtonDodge}
-                onMouseMove={handleButtonDodge}
+                onMouseEnter={handleButtonHover}
+                onMouseOver={handleButtonHover}
                 onClick={(e) => {
                   if (!isFormValid) {
                     e.preventDefault();
-                    handleButtonDodge(e);
+                    e.stopPropagation();
+                    handleButtonHover(e);
+                  }
+                }}
+                onTouchStart={(e) => {
+                  if (!isFormValid) {
+                    e.preventDefault();
+                    handleButtonHover(e);
                   }
                 }}
                 disabled={isNavigating && isSuccess}
                 style={{
                   ...styles.button,
-                  transform: `translate3d(${btnOffset.x}px, ${btnOffset.y}px, 50px) rotate(${btnOffset.rotate}deg)`,
+                  width: isFormValid ? "100%" : "85%",
+                  transform: `translate3d(${btnOffset.x}px, ${btnOffset.y}px, 40px) rotate(${btnOffset.rotate}deg)`,
                   transition: isFormValid
-                    ? "transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s ease, box-shadow 0.3s ease"
-                    : "transform 0.18s cubic-bezier(0.25, 1, 0.5, 1)",
+                    ? "transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), width 0.3s ease, background 0.3s ease, box-shadow 0.3s ease"
+                    : "transform 0.15s ease-out, width 0.3s ease",
                   background: isSuccess
                     ? "linear-gradient(135deg, #10b981 0%, #059669 100%)"
                     : isFormValid
@@ -538,7 +537,8 @@ const styles = {
   },
   buttonArea: {
     width: "100%",
-    padding: "4px 0",
+    minHeight: "70px",
+    margin: "8px 0 4px 0",
     position: "relative",
     display: "flex",
     justifyContent: "center",
@@ -546,15 +546,14 @@ const styles = {
     transformStyle: "preserve-3d",
   },
   button: {
-    marginTop: "8px",
-    width: "100%",
-    padding: "14px",
+    padding: "14px 20px",
     border: "none",
-    borderRadius: "10px",
+    borderRadius: "12px",
     color: "#ffffff",
     fontSize: "16px",
     fontWeight: "600",
     position: "relative",
+    userSelect: "none",
   },
   buttonText: {
     transform: "translateZ(20px)",
