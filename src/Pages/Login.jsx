@@ -316,15 +316,7 @@ export default function Login() {
               </button>
             </div>
 
-            {/* Playful hint when user tries to catch runaway button */}
-            {!isFormValid && showHint && (
-              <div style={styles.warningAlert}>
-               
-              </div>
-            )}
-
-            {/* Optional Secondary Back Link */}
-         
+           
           </form>
         </div>
       </div>
