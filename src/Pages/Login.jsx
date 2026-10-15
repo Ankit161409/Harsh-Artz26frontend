@@ -324,16 +324,7 @@ export default function Login() {
             )}
 
             {/* Optional Secondary Back Link */}
-            <button
-              type="button"
-              onClick={handleBack}
-              disabled={isNavigating}
-              style={styles.secondaryBackBtn}
-            >
-              {isNavigating && !isSuccess
-                ? `Returning home in ${countdown}s...`
-                : "← Return to Home"}
-            </button>
+         
           </form>
         </div>
       </div>
