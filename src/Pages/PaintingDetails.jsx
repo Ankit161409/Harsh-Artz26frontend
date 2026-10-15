@@ -394,7 +394,7 @@ const PaintingDetails = () => {
                 <div className="meta-item">
                   <span className="meta-label">Authenticity</span>
                   <span className="meta-value">
-                    {painting.authenticity || "Signed by Artist"}
+                    {painting.authenticity || "Signed by Harsh Artz"}
                   </span>
                 </div>
               </div>
