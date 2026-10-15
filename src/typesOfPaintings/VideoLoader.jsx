@@ -35,4 +35,4 @@ const VideoLoader = ({
   );
 };
 
-export default VideoLoader;
+export default VideoLoader
