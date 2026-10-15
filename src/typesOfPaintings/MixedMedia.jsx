@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import "./Gallery3D.css";
+import VideoLoader from "./VideoLoader";
 
 const API_BASE_URL = (
   process.env.REACT_APP_API_BASE_URL ||
@@ -483,7 +484,7 @@ const MixedMedia = () => {
 
   // Loading screen.
  if (loading) {
-  return <VideoLoader />;
+  return <VideoLoader/>;
 }
 
   // Fetch error screen.

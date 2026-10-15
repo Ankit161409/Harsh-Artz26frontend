@@ -3,6 +3,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import "./PenSketches.css";
+import VideoLoader from "./VideoLoader";
 
 const API_BASE_URL = (
   process.env.REACT_APP_API_BASE_URL ||

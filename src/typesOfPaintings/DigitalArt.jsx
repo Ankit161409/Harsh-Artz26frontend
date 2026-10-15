@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import "./Gallery3D.css";
+import VideoLoader from "./VideoLoader";
 
 const API_BASE_URL = (
   import.meta.env.VITE_API_BASE_URL ||
