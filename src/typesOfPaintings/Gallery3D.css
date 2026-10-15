@@ -377,11 +377,11 @@
   100% { transform:translate(0.5px)} 
 }
 .video-loader-content {
-  width: min(420px, 90vw);
-  max-height: 100vh;
+  width: min(720px, 94vw);
+  max-height: 75vh;
   object-fit: contain;
-  border-radius: 14px;
-  box-shadow: 0 0 35px rgba(212, 175, 55, 0.15);
+  border-radius: 18px;
+  box-shadow: 0 0 45px rgba(212, 175, 55, 0.25);
 }
 
 .video-loader h2 {
