@@ -319,7 +319,7 @@ export default function Login() {
             {/* Playful hint when user tries to catch runaway button */}
             {!isFormValid && showHint && (
               <div style={styles.warningAlert}>
-                🏃‍♂️ Enter Username & Password to unlock Sign In!
+               
               </div>
             )}
 
