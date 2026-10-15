@@ -579,13 +579,9 @@ const WatercolorPaintings = () => {
   /* LOADING                                             */
   /* =================================================== */
 
-  if (loading) {
-    return (
-      <div className="background gallery-3d-root">
-        <h2>Loading watercolor paintings...</h2>
-      </div>
-    );
-  }
+ if (loading) {
+  return <VideoLoader />;
+}
 
   /* =================================================== */
   /* ERROR SCREEN                                        */

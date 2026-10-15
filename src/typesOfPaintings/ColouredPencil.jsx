@@ -509,12 +509,8 @@ const ColouredPencil = () => {
 
   // Loading screen.
   if (loading) {
-    return (
-      <div className="background gallery-3d-root">
-        <h2>Loading coloured pencil artworks...</h2>
-      </div>
-    );
-  }
+  return <VideoLoader />;
+}
 
   // Error screen.
   if (error && arts.length === 0) {

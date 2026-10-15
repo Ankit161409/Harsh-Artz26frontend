@@ -459,12 +459,8 @@ const PenSketches = () => {
 
   /* LOADING */
   if (loading) {
-    return (
-      <div className="background pen-gallery-3d-root">
-        <h2>Loading pen artworks...</h2>
-      </div>
-    );
-  }
+  return <VideoLoader />;
+}
 
   /* FETCH ERROR */
   if (error && arts.length === 0) {

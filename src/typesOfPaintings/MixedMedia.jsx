@@ -482,13 +482,9 @@ const MixedMedia = () => {
   };
 
   // Loading screen.
-  if (loading) {
-    return (
-      <div className="background gallery-3d-root">
-        <h2>Loading mixed media artworks...</h2>
-      </div>
-    );
-  }
+ if (loading) {
+  return <VideoLoader />;
+}
 
   // Fetch error screen.
   if (error && arts.length === 0) {

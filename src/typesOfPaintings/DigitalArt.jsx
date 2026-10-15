@@ -506,13 +506,9 @@ const DigitalArt = () => {
   };
 
   // Loading screen.
-  if (loading) {
-    return (
-      <div className="background gallery-3d-root">
-        <h2>Loading digital artworks...</h2>
-      </div>
-    );
-  }
+ if (loading) {
+  return <VideoLoader />;
+}
 
   // Error screen.
   if (error && arts.length === 0) {
