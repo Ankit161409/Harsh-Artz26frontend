@@ -46,7 +46,8 @@ import VideoLoader from "./VideoLoader";
         alert("Painting ID is missing.");
         return;
       }
-
+ 
+      //navigate to DetailsPage 
       navigate(
         `/paintingDetails/getCharcoalById/${encodeURIComponent(
           paintingId
