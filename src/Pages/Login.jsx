@@ -211,23 +211,7 @@ export default function Login() {
           />
 
           {/* Top Bar with Back Button */}
-          <div style={styles.topBar}>
-            <button
-              type="button"
-              onClick={handleBack}
-              disabled={isNavigating}
-              style={{
-                ...styles.backButton,
-                opacity: isNavigating ? 0.7 : 1,
-                cursor: isNavigating ? "wait" : "pointer",
-              }}
-              title="Return to Home page"
-            >
-              <span>←</span>
-              <span>Back</span>
-            </button>
-          </div>
-
+          
           {/* Success Banner Alert */}
           {isSuccess && (
             <div style={styles.successAlert}>
