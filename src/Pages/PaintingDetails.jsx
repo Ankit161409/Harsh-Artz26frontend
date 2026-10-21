@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import "./ArtGallery.css";
 import VideoLoader2 from "../typesOfPaintings/VideoLoader2";
+import "./Gallery3D.css";
 
 const API_BASE_URL = 
   "https://harsh-arts-backend-2.onrender.com";
