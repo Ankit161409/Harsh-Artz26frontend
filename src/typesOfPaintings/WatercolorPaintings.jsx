@@ -297,7 +297,7 @@ const WatercolorCard3D = ({
               transition: "transform 0.4s ease",
             }}
           >
-            <motion.h1
+            {/* <motion.h1
               className="card-title"
               whileHover={{
                 color: "#d4af37",
@@ -316,7 +316,31 @@ const WatercolorCard3D = ({
                 painting.title || "Original watercolor artwork",
                 50
               )}
-            </motion.h1>
+            </motion.h1> */}
+            <motion.h2
+  className="card-title"
+  whileHover={{
+    color: "#d4af37",
+  }}
+  style={{
+    fontFamily: '"Cormorant Garamond", Georgia, serif',
+    fontSize: "2rem",
+    fontWeight: 500,
+    fontStyle: "italic",
+    letterSpacing: "0.4px",
+    lineHeight: 1.4,
+    color: "#e8dcc8",
+    WebkitTextFillColor: "#e8dcc8",
+    textAlign: "center",
+    width: "100%",
+    margin: "0 0 10px",
+  }}
+>
+  {trimWords(
+    painting.title || "Original watercolor artwork",
+    50
+  )}
+</motion.h2>
 
             <p className="card-description">
               {trimWords(
