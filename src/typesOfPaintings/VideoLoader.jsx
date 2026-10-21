@@ -9,7 +9,7 @@ const VideoLoader = ({
   const gifSrc = `${process.env.PUBLIC_URL || ""}/loading-art.gif`;
 
   return (
-    <div className="video-loader">
+    <div className="video-loader uuperse">
       <img
         src={gifSrc}
         alt="Loading..."
