@@ -16,8 +16,8 @@ const VideoLoader2 = ({
         className="video-loader-content"
         style={{
           width: size,
-          maxWidth: "66vw",
-          maxHeight: "45vh",
+          maxWidth: "55vw",
+          maxHeight: "35vh",
           objectFit: "contain",
         }}
         onError={(e) => {
