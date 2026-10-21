@@ -94,3 +94,148 @@
   display: block;
   object-fit: contain;
 }
+/* ================================
+   SIDEBAR MOBILE FIXES
+   ================================ */
+
+/* Sidebar full width le */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw !important;       /* ✅ Full screen width */
+  max-width: 100vw !important;
+  height: 100vh;
+  background: #111;
+  z-index: 9999;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+/* Overlay bhi full cover kare */
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 9998;
+  width: 100vw;
+  height: 100vh;
+}
+
+/* Sidebar top — logo aur close button */
+.sidebar-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-logo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+  text-decoration: none;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.sidebar-close {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  line-height: 1;
+}
+
+/* Nav links — each on its own line */
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  padding: 16px 0;
+  gap: 0;
+}
+
+/* Each sidebar link — proper spacing */
+.sidebar-link {
+  display: block;
+  width: 100%;
+  padding: 16px 24px;              /* ✅ Proper spacing */
+  color: #fff;
+  text-decoration: none;
+  font-size: 1.1rem;
+  font-weight: 500;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: none;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  text-align: left;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.sidebar-link:hover,
+.sidebar-link:active {
+  background: rgba(255, 255, 255, 0.08);
+  color: #d4af37;
+}
+
+/* Accordion trigger — Art Gallery */
+.accordion-trigger {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.accordion-caret {
+  font-size: 1.2rem;
+  color: #d4af37;
+  margin-left: 8px;
+}
+
+/* Sub-links inside accordion — each on own line */
+.accordion-panel {
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.sidebar-sublink {
+  display: block;                  /* ✅ Each on own line */
+  width: 100%;
+  padding: 14px 24px 14px 40px;   /* ✅ Indented */
+  color: rgba(255, 255, 255, 0.75);
+  text-decoration: none;
+  font-size: 0.95rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  transition: background 0.2s, color 0.2s;
+}
+
+.sidebar-sublink:hover,
+.sidebar-sublink:active {
+  background: rgba(255, 255, 255, 0.07);
+  color: #d4af37;
+}
+
+/* Sidebar footer */
+.sidebar-footer {
+  margin-top: auto;
+  padding: 20px 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.85rem;
+  line-height: 1.8;
+}
+
+/* ================================
+   BODY SCROLL LOCK when sidebar open
+   ================================ */
+body.sidebar-open {
+  overflow: hidden;
+}
