@@ -811,5 +811,4 @@ const WatercolorPaintings = () => {
 };
 
 export default WatercolorPaintings;
-
-export default WatercolorPaintings;
+ 
