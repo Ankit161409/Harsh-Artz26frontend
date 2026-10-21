@@ -224,7 +224,7 @@ const PenCard3D = ({
             }}
           >
             <motion.h1
-              className="card-description"
+              className="card-title"
               style={{
                 fontFamily: '"Cormorant Garamond", Georgia, serif',
                 fontSize: "2rem",
@@ -623,5 +623,7 @@ const PenSketches = () => {
     </div>
   );
 };
+
+export default PenSketches;
 
 export default PenSketches;

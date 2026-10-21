@@ -1,4 +1,3 @@
-
 /* ===================================================== */
 /* UNIFIED 3D ART GALLERY - LUXURY EXHIBITION STYLES     */
 /* ===================================================== */
@@ -377,16 +376,6 @@
   -webkit-text-fill-color: var(--gallery-gold);
 }
 
-/* DESCRIPTION */
-
-.card-description {
-  font-size: 0.92rem;
-  color: var(--gallery-text-muted);
-  line-height: 1.6;
-  margin: 0 0 18px;
-  flex-grow: 1;
-}
-
 /* FOOTER */
 
 .card-footer {
@@ -397,6 +386,7 @@
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   padding-top: 12px;
   font-size: 0.78rem;
+  margin-top: auto;
 }
 
 .card-curation {

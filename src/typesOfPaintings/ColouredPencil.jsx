@@ -277,14 +277,6 @@ const ColouredPencilCard3D = ({
               )}
             </motion.h1>
 
-            <p className="card-description">
-              {trimWords(
-                painting.description ||
-                  "Original coloured pencil artwork",
-                50
-              )}
-            </p>
-
             <div className="card-footer">
               <span className="artist-name" />
               <span className="card-curation">

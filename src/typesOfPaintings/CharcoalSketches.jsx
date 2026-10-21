@@ -203,7 +203,7 @@ import VideoLoader from "./VideoLoader";
               }}
             >
               <motion.h1
-                className="card-description"
+                className="card-title"
                 style={{
                   fontFamily: '"Cormorant Garamond", Georgia, serif',
                   fontSize: "2rem",
@@ -522,5 +522,7 @@ import VideoLoader from "./VideoLoader";
       </div>
     );
   };
+
+  export default CharcoalSketches;
 
   export default CharcoalSketches;

@@ -254,7 +254,7 @@ const MixedMediaCard3D = ({
             }}
           >
             <motion.h1
-              className="card-description"
+              className="card-title"
               style={{
                 fontFamily: '"Cormorant Garamond", Georgia, serif',
                 fontSize: "2rem",
@@ -270,12 +270,6 @@ const MixedMediaCard3D = ({
                 50
               )}
             </motion.h1>
-
-            {painting.description && (
-              <p className="card-description">
-                {trimWords(painting.description, 25)}
-              </p>
-            )}
 
             <div className="card-footer">
               <span className="artist-name" />
@@ -622,5 +616,7 @@ const MixedMedia = () => {
     </div>
   );
 };
+
+export default MixedMedia;
 
 export default MixedMedia;

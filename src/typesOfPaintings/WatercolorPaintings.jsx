@@ -342,14 +342,6 @@ const WatercolorCard3D = ({
   )}
 </motion.h2>
 
-            <p className="card-description">
-              {trimWords(
-                painting.description ||
-                  "Original watercolor painting",
-                50
-              )}
-            </p>
-
             <div className="card-footer">
               <span className="artist-name" />
               <span className="card-curation">
@@ -817,5 +809,7 @@ const WatercolorPaintings = () => {
     </div>
   );
 };
+
+export default WatercolorPaintings;
 
 export default WatercolorPaintings;
