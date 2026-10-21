@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import "./ArtGallery.css";
+import VideoLoader2 from "../typesOfPaintings/VideoLoader2";
 
 const API_BASE_URL = 
   "https://harsh-arts-backend-2.onrender.com";
@@ -187,16 +188,9 @@ const PaintingDetails = () => {
   const mediumLabel = getMediumName(apiType);
 
   /* ✅ Loading screen */
-  if (loading) {
-    return (
-      <div className="painting-not-found-3d">
-        <p>⏳ Loading artwork details...</p>
-        <p style={{ fontSize: "0.8em", color: "#888", marginTop: "8px" }}>
-          Server may be starting up, please wait...
-        </p>
-      </div>
-    );
-  }
+ if (loading) {
+  return <VideoLoader2 />;
+}
 
   /* ✅ Error screen with retry */
   if (error || !painting) {
