@@ -231,8 +231,12 @@ const PenCard3D = ({
                 fontWeight: 500,
                 fontStyle: "italic",
                 letterSpacing: "0.4px",
-                lineHeight: 1.6,
+                lineHeight: 1.4,
                 color: "#e8dcc8",
+                WebkitTextFillColor: "#e8dcc8",
+                textAlign: "center",
+                width: "100%",
+                margin: "0 0 10px",
               }}
             >
               {trimWords(
@@ -625,5 +629,3 @@ const PenSketches = () => {
 };
 
 export default PenSketches;
-
- 

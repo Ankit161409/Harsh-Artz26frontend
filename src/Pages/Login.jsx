@@ -171,7 +171,7 @@ export default function Login() {
     // Auto-redirect to home smoothly without alert
     timerRef.current = setTimeout(() => {
       try {
-        navigate("/");
+        navigate(-1);
       } catch {
         window.location.href = "/";
       }

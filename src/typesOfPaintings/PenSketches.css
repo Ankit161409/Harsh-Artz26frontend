@@ -40,6 +40,7 @@
 
 /* Hero Header Section */
 .pen-hero-3d {
+  width: 100%;
   max-width: 900px;
   margin: 0 auto 60px;
   text-align: center;
@@ -75,23 +76,39 @@
   box-shadow: 0 0 8px var(--pen-gold);
 }
 
+/* MAIN PAGE HERO TITLE */
+.pen-gallery-3d-root .pen-hero-3d .pen-title-3d,
 .pen-title-3d {
-  font-size: clamp(2.6rem, 5vw, 4.2rem);
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  text-align: center;
+  align-self: center;
+  font-size: clamp(2.3rem, 5vw, 4.2rem);
   font-weight: 800;
   letter-spacing: -1px;
-  margin: 0 0 16px;
-  background: linear-gradient(135deg, #ffffff 30%, #e0c776 100%);
+  line-height: 1.2;
+  margin: 0 auto 16px;
+  padding: 0;
+
+  background: linear-gradient(135deg, #ffffff 20%, #e0c776 60%, #d4af37 100%);
+  background-clip: text;
   -webkit-background-clip: text;
+  color: #ffffff;
   -webkit-text-fill-color: transparent;
-  text-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+
+  /* Use filter drop-shadow instead of text-shadow to prevent clipping transparent gradient text */
+  filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.7));
 }
 
 .pen-subtitle-3d {
+  width: 100%;
   font-size: 1.08rem;
   color: var(--pen-text-muted);
   line-height: 1.6;
   max-width: 620px;
-  margin: 0 0 24px;
+  margin: 0 auto 24px;
+  text-align: center;
 }
 
 .pen-hint-banner {
@@ -250,15 +267,37 @@
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+  min-width: 0;
 }
 
+/* ARTWORK CARD TITLE - FORCED VISIBLE & CENTERED */
+.pen-gallery-3d-root .pen-card-content .card-title,
+.pen-card-content .card-title,
 .card-title {
-  font-size: 1.32rem;
-  font-weight: 700;
-  color: #ffffff;
+  display: block;
+  width: 100%;
+  text-align: center;
+  align-self: center;
+
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: 2rem;
+  font-weight: 500;
+  font-style: italic;
+  letter-spacing: 0.4px;
+  line-height: 1.4;
+
+  color: #e8dcc8;
+  -webkit-text-fill-color: #e8dcc8;
+
   margin: 0 0 10px;
-  line-height: 1.35;
+  overflow-wrap: anywhere;
   transition: color 0.3s ease;
+}
+
+.pen-gallery-3d-root .pen-card-content .card-title:hover,
+.pen-card-content .card-title:hover {
+  color: var(--pen-gold);
+  -webkit-text-fill-color: var(--pen-gold);
 }
 
 .card-footer {
