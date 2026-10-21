@@ -223,7 +223,7 @@ const PaintingDetails = () => {
   }
 
   return (
-    <div className="painting-details-3d-root">
+    <div className="painting-details-3d-root upperse">
       <div className="details-spotlight-beam" />
 
       <div className="details-content-wrapper">
