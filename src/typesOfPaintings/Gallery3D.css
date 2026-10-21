@@ -508,7 +508,7 @@
   max-height: 75vh;
   object-fit: contain;
   border-radius: 18px;
-  box-shadow: 0 0 45px rgba(212, 175, 55, 0.25);
+  box-shadow: 0 0 45px rgba(10, 10, 10, 0.25);
 }
 
 .video-loader h2 {
